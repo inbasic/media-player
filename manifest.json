@@ -43,6 +43,7 @@
       "description": "Toggle play/pause"
     }
   },
+  "homepage_url": "http://add0n.com/the-media-player.html",
   "applications": {
     "gecko": {
       "id": "{9051e1b5-f28b-48d2-af1c-b1cbd8a3d0e0}",

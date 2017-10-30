@@ -38,7 +38,6 @@ var notify = message => chrome.notifications.create(null, {
 });
 
 var save = prefs => {
-  console.log(prefs);
   chrome.storage.local.set(prefs);
 };
 
@@ -86,3 +85,25 @@ chrome.contextMenus.onClicked.addListener(info => {
 chrome.commands.onCommand.addListener(method => find().then(t => chrome.tabs.sendMessage(t.id, {
   method
 })).catch(() => notify('Please open "Media Player" and retry')));
+
+// FAQs & Feedback
+chrome.storage.local.get({
+  'version': null,
+  'faqs': false
+}, prefs => {
+  const version = chrome.runtime.getManifest().version;
+
+  if (prefs.version ? (prefs.faqs && prefs.version !== version) : true) {
+    chrome.storage.local.set({version}, () => {
+      chrome.tabs.create({
+        url: 'http://add0n.com/the-media-player.html?version=' + version +
+          '&type=' + (prefs.version ? ('upgrade&p=' + prefs.version) : 'install')
+      });
+    });
+  }
+});
+
+{
+  const {name, version} = chrome.runtime.getManifest();
+  chrome.runtime.setUninstallURL('http://add0n.com/feedback.html?name=' + name + '&version=' + version);
+}
