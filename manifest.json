@@ -1,0 +1,52 @@
+{
+  "manifest_version": 2,
+  "version": "0.1.2",
+  "name": "Media Player",
+  "description": "A simple yet powerful media player built on top of video.js project",
+  "background": {
+    "persistent": false,
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "*://*/*",
+    "contextMenus",
+    "notifications"
+  ],
+  "browser_action": {
+    "default_icon": {
+      "16": "data/icons/16.png",
+      "32": "data/icons/32.png",
+      "48": "data/icons/48.png",
+      "64": "data/icons/64.png"
+    }
+  },
+  "icons": {
+    "16": "data/icons/16.png",
+    "32": "data/icons/32.png",
+    "48": "data/icons/48.png",
+    "64": "data/icons/64.png",
+    "128": "data/icons/128.png",
+    "256": "data/icons/256.png"
+  },
+  "commands": {
+    "previous-track": {
+      "description": "Previous track"
+    },
+    "next-track": {
+      "description": "Next track"
+    },
+    "toggle-play": {
+      "description": "Toggle play/pause"
+    }
+  },
+  "applications": {
+    "gecko": {
+      "id": "{9051e1b5-f28b-48d2-af1c-b1cbd8a3d0e0}",
+      "strict_min_version": "52.0"
+    }
+  }
+}
