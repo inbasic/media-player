@@ -98,6 +98,16 @@
           reader.readAsText(file);
         }
       };
+      player.on('loadstart', () => {
+        const index = player.playlist.currentItem();
+        if (index > -1) {
+          const item = player.playlist()[index];
+          const caption = item.caption;
+          if (caption) {
+            player.caption(caption);
+          }
+        }
+      });
     }
   }
   videojs.registerPlugin('captionPlugin', CaptionPlugin);

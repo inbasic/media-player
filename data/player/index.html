@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="video.js/plugins/stop-button/video.js-stop-button.css">
     <link rel="stylesheet" type="text/css" href="video.js/plugins/fix-control-bar/video.js-fixed-control-bar.css">
     <link rel="stylesheet" href="video.js/plugins/poster/video.js-poster.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-ui/videojs-playlist-ui.vertical.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-ui/videojs-playlist-ui-extra.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-button/video.js-playlist-button.css">
     <title>Loading - Media Player</title>
   </head>
   <body hbox>
@@ -22,6 +25,7 @@
             poster="poster.png">
         </video>
       </div>
+      <div id="playlist" class="vjs-playlist vjs-hidden"></div>
     </div>
     <div id="toast"></div>
     <script src="video.js/video.min.js"></script>
@@ -32,6 +36,11 @@
     <script src="video.js/plugins/stop-button/video.js-stop-button.js"></script>
     <script src="video.js/plugins/caption/video.js.caption.js"></script>
     <script src="video.js/plugins/history/video.js-history.js"></script>
+    <script src="video.js/plugins/playlist/videojs-playlist.js"></script>
+    <script src="video.js/plugins/playlist-ui/videojs-playlist-ui.js"></script>
+    <script src="video.js/plugins/playlist-ui/videojs-playlist-ui-extra.js"></script>
+    <script src="video.js/plugins/playlist-button/video.js-playlist-button.js"></script>
+    <script src="video.js/plugins/title/video.js-title.js"></script>
     <script src="api.js"></script>
     <script src="drop.js"></script>
     <script src="index.js"></script>

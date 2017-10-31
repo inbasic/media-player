@@ -14,17 +14,19 @@ window.addEventListener('beforeunload', () => {
 });
 
 // message passing
-chrome.runtime.onMessage.addListener(request => {
-  if (request.method === 'open-src') {
-    api.remote([request.src]);
-  }
-  else if (request.method === 'previous-track') {
-    api.previous();
-  }
-  else if (request.method === 'next-track') {
-    api.next();
-  }
-  else if (request.method === 'toggle-play') {
-    api.player.toggle();
-  }
-});
+if (chrome.runtime && chrome.runtime.onMessage) {
+  chrome.runtime.onMessage.addListener(request => {
+    if (request.method === 'open-src') {
+      api.remote([request.src]);
+    }
+    else if (request.method === 'previous-track') {
+      api.previous();
+    }
+    else if (request.method === 'next-track') {
+      api.next();
+    }
+    else if (request.method === 'toggle-play') {
+      api.player.toggle();
+    }
+  });
+}

@@ -2,7 +2,17 @@
 'use strict';
 
 var api = {
-  arguments: {}
+  arguments: {},
+  config: {
+    name: 'Media Player',
+    seek: {
+      forward: [10, 30],
+      backward: [10, 30]
+    },
+    inactivityTimeout: 4,
+    delay: 2,
+    repeat: true
+  }
 };
 if (window.location.search) {
   window.location.search.substr(1).split('&').forEach(s => {
@@ -13,24 +23,29 @@ if (window.location.search) {
 
 api.player = videojs('video-player', {
   'fluid': true,
-  'inactivityTimeout': 4000,
+  'inactivityTimeout': api.config.inactivityTimeout * 1000,
   'plugins': {
+    playlist: {},
+    playlistButtonPlugin: {},
+    playlistMenuExtraPlugin: {},
+    titlePlugin: {},
     trackVolumePlugin: {},
     keyboardPlugin: {},
     mousePlugin: {},
     captionPlugin: {},
-    seekButtonsPlugin: {
-      forward: [10, 30],
-      backward: [10, 30]
-    },
+    seekButtonsPlugin: api.config.seek,
     stopButtonPlugin: {},
     historyPlugin: {}
   }
 }, () => {
-  document.title = 'Media Player';
+  document.title = api.config.name;
   if (api.arguments.src) {
     api.remote([api.arguments.src]);
   }
+  api.player.playlist.autoadvance(api.config.delay);
+  api.player.playlist.repeat(api.config.repeat);
+
+  api.player.playlistUi(document.getElementById('playlist'));
 });
 
 api.player.bigPlayButton.on('click', () => {
@@ -42,81 +57,61 @@ api.player.bigPlayButton.on('click', () => {
 });
 
 // api.next
+// api.previous
 // api.local
 // api.remote
-{
-  const queue = {
-    media: []
-  };
-  let index = -1;
-  api.next = () => {
-    if (queue.media.length) {
-      index += 1;
-      if (index >= queue.media.length) {
-        index = queue.media.length - 1;
-        api.toast('No next track');
-        return;
+api.next = () => {
+  if (!api.player.playlist.next()) {
+    api.toast('No more tracks');
+  }
+};
+api.previous = () => {
+  if (!api.player.playlist.previous()) {
+    api.toast('No previous track');
+  }
+};
+api.append = list => {
+  const olist = api.player.playlist();
+  api.player.playlist([...olist, ...list], olist.length);
+  api.player.play();
+};
+api.local = files => {
+  const playlist = files
+  .filter(f => f.type && (f.type.startsWith('video/') || f.type.startsWith('audio/')))
+  .map(file => {
+    // looking for subtitles
+    const base = file.name.replace(/\.[^.]*$/, '');
+    const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
+    return {
+      name: file.name.replace(/\.[^.]+$/, ''),
+      duration: '--',
+      caption,
+      sources: [{
+        src: URL.createObjectURL(file),
+        type: file.type
+      }]
+    };
+  });
+  api.append(playlist);
+};
+api.remote = urls => {
+  const playlist = urls.map(src => {
+    if (/google\.[^./]+\/url?/.test(src)) {
+      const tmp = /url=([^&]+)/.exec(src);
+      if (tmp && tmp.length) {
+        src = decodeURIComponent(tmp[1]);
       }
-      const media = queue.media[index];
-      api.player.src({
-        src: media.src,
-        type: media.type,
-        name: media.name
-      });
-      if (media.caption) {
-        api.player.caption(media.caption);
-      }
-      api.player.play();
-      document.title = media.name + ' - Media Player';
-      api.toast(media.name);
     }
-  };
-  api.previous = () => {
-    index -= 2;
-    if (index < -1) {
-      index = 0;
-      return api.toast('No previous track');
-    }
-    api.next();
-  };
-  api.local = files => {
-    files.filter(f => f.type).forEach(file => {
-      if (file.type.startsWith('video/') || file.type.startsWith('audio/')) {
-        const obj = {
-          src: URL.createObjectURL(file),
-          type: file.type,
-          name: file.name
-        };
-        queue.media.push(obj);
-        // looking for subtitles
-        const base = file.name.replace(/\.[^.]*$/, '');
-        const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
-        if (caption) {
-          obj.caption = caption;
-        }
-      }
-    });
-    console.log(queue.media);
-    api.next();
-  };
-  api.remote = urls => {
-    urls.forEach(src => {
-      if (/google\.[^./]+\/url?/.test(src)) {
-        const tmp = /url=([^&]+)/.exec(src);
-        if (tmp && tmp.length) {
-          src = decodeURIComponent(tmp[1]);
-        }
-      }
-      queue.media.push({
-        src,
-        type: 'video/mp4',
-        name: 'unknown'
-      });
-    });
-    api.next();
-  };
-}
-
+    return src;
+  }).map(src => ({
+    sources: [{
+      src,
+      type: 'video/mp4',
+      name: 'unKnown'
+    }]
+  }));
+  api.append(playlist);
+};
 // api.toast
 {
   let id;
@@ -132,4 +127,6 @@ api.player.bigPlayButton.on('click', () => {
 }
 
 // api.background
-chrome.runtime.getBackgroundPage(b => api.background = b);
+if (chrome.runtime && chrome.runtime.getBackgroundPage) {
+  chrome.runtime.getBackgroundPage(b => api.background = b);
+}

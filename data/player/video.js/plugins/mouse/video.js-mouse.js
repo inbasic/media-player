@@ -26,6 +26,9 @@
       {
         let last = 0;
         document.body.addEventListener('mousewheel', e => {
+          if (e.target.localName !== 'video') {
+            return;
+          }
           const now = Date.now();
           if (last + 50 < now && e.deltaY) {
             if (e.deltaY - e.deltaX > 1 || e.deltaY - e.deltaX < -1) {

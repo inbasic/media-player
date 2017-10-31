@@ -15,40 +15,64 @@
         }, prefs => Object.assign(cache, prefs.cache));
       }
 
-      player.on('timeupdate', () => {
-        const name = api.player.cache_.source.name;
-        if (name) {
-          cache[name] = player.currentTime();
-        }
-      });
       const save = () => {
         if (api.background) {
           api.background.save({cache});
         }
+        else {
+          save.dummy.cache = Object.assign({}, cache);
+        }
       };
+      save.dummy = {
+        cache: {}
+      };
+      const read = (prefs, callback) => {
+        if (chrome.storage) {
+          chrome.storage.local.get(prefs, callback);
+        }
+        else {
+          callback(save.dummy);
+        }
+      };
+
+      player.on('timeupdate', () => {
+        const index = player.playlist.currentItem();
+        if (index > -1) {
+          const name = player.playlist()[index].name;
+          if (name) {
+            cache[name] = player.currentTime();
+          }
+        }
+      });
+
       player.on('loadedmetadata', () => {
-        const name = api.player.cache_.source.name;
-        if (name && chrome.storage) {
-          chrome.storage.local.get({
-            cache: {}
-          }, prefs => {
-            if (prefs.cache[name]) {
-              player.currentTime(prefs.cache[name]);
-              cache[name] = prefs.cache[name];
-            }
-            save();
-          });
+        const index = player.playlist.currentItem();
+        if (index > -1) {
+          const name = player.playlist()[index].name;
+          if (name) {
+            read({
+              cache: {}
+            }, prefs => {
+              if (prefs.cache[name]) {
+                player.currentTime(prefs.cache[name]);
+                cache[name] = prefs.cache[name];
+              }
+              save();
+            });
+          }
         }
       });
       window.addEventListener('beforeunload', save);
 
       player.on('ended', () => {
-        const name = api.player.cache_.source.name;
-        if (name) {
-          cache[name] = 0;
-          save();
+        const index = player.playlist.currentItem();
+        if (index > -1) {
+          const name = player.playlist()[index].name;
+          if (name) {
+            cache[name] = 0;
+            save();
+          }
         }
-        api.next();
       });
     }
   }
