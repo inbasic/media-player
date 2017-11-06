@@ -11,12 +11,16 @@
     <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-ui/videojs-playlist-ui.vertical.css">
     <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-ui/videojs-playlist-ui-extra.css">
     <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-button/video.js-playlist-button.css">
+    <!--
+      <link rel="stylesheet" href="video.js/plugins/fullwidth-progressbar/video.js-fullwith-progressbar.css">
+    -->
     <title>Loading - Media Player</title>
   </head>
   <body hbox>
     <div id="sidebar">side</div>
     <div id="content" flex="1">
       <div id=player>
+        <div id="wave-surfer"></div>
         <video
             id="video-player"
             class="video-js"
@@ -29,7 +33,9 @@
     </div>
     <div id="toast"></div>
     <script src="video.js/video.min.js"></script>
+    <script src="video.js/plugins/wavesurfer/wavesurfer.min.js"></script>
     <script src="video.js/plugins/volume/video.js-volume.js"></script>
+    <script src="video.js/plugins/wavesurfer/wavesurfer.min.js"></script>
     <script src="video.js/plugins/keyboard/video.js-keyboard.js"></script>
     <script src="video.js/plugins/mouse/video.js-mouse.js"></script>
     <script src="video.js/plugins/seek-buttons/video.js-seek-buttons.js"></script>
@@ -41,6 +47,8 @@
     <script src="video.js/plugins/playlist-ui/videojs-playlist-ui-extra.js"></script>
     <script src="video.js/plugins/playlist-button/video.js-playlist-button.js"></script>
     <script src="video.js/plugins/title/video.js-title.js"></script>
+    <script src="video.js/plugins/wavesurfer/vidoe.js-wavesurfer.js"></script>
+    <script src="video.js/plugins/smart-inactive/video.js-smart-inactive.js"></script>
     <script src="api.js"></script>
     <script src="drop.js"></script>
     <script src="index.js"></script>

@@ -11,7 +11,8 @@ var api = {
     },
     inactivityTimeout: 4,
     delay: 2,
-    repeat: true
+    repeat: true,
+    playbackRates: [0.5, 1, 1.5, 2, 5]
   }
 };
 if (window.location.search) {
@@ -23,7 +24,7 @@ if (window.location.search) {
 
 api.player = videojs('video-player', {
   'fluid': true,
-  'inactivityTimeout': api.config.inactivityTimeout * 1000,
+  'playbackRates': api.config.playbackRates,
   'plugins': {
     playlist: {},
     playlistButtonPlugin: {},
@@ -35,7 +36,15 @@ api.player = videojs('video-player', {
     captionPlugin: {},
     seekButtonsPlugin: api.config.seek,
     stopButtonPlugin: {},
-    historyPlugin: {}
+    historyPlugin: {},
+    waveSurferPlugin: {
+      waveColor: 'rgba(115,133,159,.75)',
+      progressColor: 'rgba(0, 0, 0, 0.5)',
+      height: 300
+    },
+    smartInactivePlugin: {
+      inactivityTimeout: api.config.inactivityTimeout * 1000
+    },
   }
 }, () => {
   document.title = api.config.name;
@@ -85,10 +94,11 @@ api.local = files => {
     return {
       name: file.name.replace(/\.[^.]+$/, ''),
       duration: '--',
+      type: file.type,
       caption,
       sources: [{
         src: URL.createObjectURL(file),
-        type: file.type
+        type: file.type,
       }]
     };
   });

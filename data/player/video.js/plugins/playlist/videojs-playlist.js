@@ -128,7 +128,7 @@ var playItem = function playItem(player, delay, item) {
   var replay = !player.paused() || player.ended();
 
   player.trigger('beforeplaylistitem', item);
-  //player.poster(item.poster || '');
+  player.poster(item.poster || '');
   player.src(item.sources);
   clearTracks(player);
   (item.textTracks || []).forEach(player.addRemoteTextTrack.bind(player));

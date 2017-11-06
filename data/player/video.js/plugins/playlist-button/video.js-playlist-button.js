@@ -28,7 +28,10 @@
           playlist[length > 1 ? 'show' : 'hide']();
         });
         playlist.el().appendChild(player.playlistMenu.el());
-        document.addEventListener('click', ({target}) => {
+        document.addEventListener('click', e => {
+          const target = e.target;
+          e.preventDefault();
+          e.stopImmediatePropagation();
           if (!playlist.el().contains(target)) {
             player.playlistMenu.addClass('vjs-hidden');
           }
