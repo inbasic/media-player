@@ -8,11 +8,14 @@
     constructor(player, options) {
       super(player, options);
 
-      player.on('loadstart', () => {
+      player.on('loadedmetadata', () => {
         const index = player.playlist.currentItem();
         if (index > -1) {
-          const type = player.playlist()[index].type;
-          player.options_.inactivityTimeout = type.startsWith('audio/') ? null : options.inactivityTimeout;
+          const type = player.playlist()[index].type || '';
+          const video = player.el().querySelector('video');
+          const audio = type.startsWith('audio/') || (video.videoWidth === 0 && video.videoHeight === 0);
+
+          player.options_.inactivityTimeout = audio ? null : options.inactivityTimeout;
           player.userActive(true);
         }
       });

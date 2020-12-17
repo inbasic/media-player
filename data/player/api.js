@@ -1,7 +1,12 @@
 /* globals videojs */
 'use strict';
 
-var api = {
+const exts = [
+  'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv', 'vob',
+  'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc', 'm3u8'
+];
+
+const api = {
   arguments: {},
   config: {
     name: 'Media Player',
@@ -15,6 +20,7 @@ var api = {
     playbackRates: [0.5, 1, 1.5, 2, 5]
   }
 };
+window.api = api;
 if (window.location.search) {
   window.location.search.substr(1).split('&').forEach(s => {
     const tmp = s.split('=');
@@ -44,7 +50,7 @@ api.player = videojs('video-player', {
     },
     smartInactivePlugin: {
       inactivityTimeout: api.config.inactivityTimeout * 1000
-    },
+    }
   }
 }, () => {
   document.title = api.config.name;
@@ -86,25 +92,32 @@ api.append = list => {
 };
 api.local = files => {
   const playlist = files
-  .filter(f => f.type && (f.type.startsWith('video/') || f.type.startsWith('audio/')))
-  .map(file => {
-    // looking for subtitles
-    const base = file.name.replace(/\.[^.]*$/, '');
-    const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
-    return {
-      name: file.name.replace(/\.[^.]+$/, ''),
-      duration: '--',
-      type: file.type,
-      caption,
-      sources: [{
-        src: URL.createObjectURL(file),
+    .filter(f => {
+      if (f.type) {
+        return f.type.startsWith('video/') || f.type.startsWith('audio/');
+      }
+      else {
+        return exts.some(e => f.name.toLowerCase().indexOf('.' + e) !== -1);
+      }
+    })
+    .map(file => {
+      // looking for subtitles
+      const base = file.name.replace(/\.[^.]*$/, '');
+      const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
+      return {
+        name: file.name.replace(/\.[^.]+$/, ''),
+        duration: '--',
         type: file.type,
-      }]
-    };
-  });
+        caption,
+        sources: [{
+          src: URL.createObjectURL(file),
+          type: file.type
+        }]
+      };
+    });
   api.append(playlist);
 };
-api.remote = urls => {
+api.remote = async urls => {
   const playlist = urls.map(src => {
     if (/google\.[^./]+\/url?/.test(src)) {
       const tmp = /url=([^&]+)/.exec(src);
@@ -116,10 +129,22 @@ api.remote = urls => {
   }).map(src => ({
     sources: [{
       src,
-      type: 'video/mp4',
-      name: 'unKnown'
+      name: src.split('/').pop()
     }]
   }));
+
+  await Promise.all(playlist.map(o => {
+    const controller = new AbortController();
+    return fetch(o.sources[0].src, {
+      signal: controller.signal
+    }).then(r => {
+      const type = r.headers.get('content-type');
+      if (type) {
+        o.sources[0].type = type;
+      }
+    }).catch(e => console.warn('cannot extract content-type', e)).finally(() => controller.abort());
+  }));
+
   api.append(playlist);
 };
 // api.toast

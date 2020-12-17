@@ -3,7 +3,7 @@
 
 // resize
 window.addEventListener('beforeunload', () => {
-  if (api.background) {
+  if (api.background && api.arguments.mode === 'window') {
     api.background.save({
       left: window.screenX,
       top: window.screenY,
@@ -30,3 +30,8 @@ if (chrome.runtime && chrome.runtime.onMessage) {
     }
   });
 }
+
+// port
+chrome.runtime.connect({
+  name: 'media-player'
+});

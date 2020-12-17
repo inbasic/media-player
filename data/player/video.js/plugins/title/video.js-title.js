@@ -13,7 +13,10 @@
         if (index > -1) {
           const playlist = player.playlist();
           const item = playlist[index];
-          const name = item.name;
+          let name = item.name;
+          if (!name && item.sources) {
+            name = item.sources[0].name;
+          }
           const stat = (index + 1) + '/' + playlist.length;
           document.title = `[${stat}] ${name} - ${api.config.name}`;
           document.body.dataset.type = item.type;
