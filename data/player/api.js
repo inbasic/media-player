@@ -15,7 +15,7 @@ const api = {
       backward: [10, 30]
     },
     inactivityTimeout: 4,
-    playbackRates: [0.5, 1, 1.5, 2, 5]
+    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2').split(/\s*,\s*/)
   }
 };
 window.api = api;
@@ -29,6 +29,9 @@ if (window.location.search) {
 api.player = videojs('video-player', {
   'fluid': true,
   'playbackRates': api.config.playbackRates,
+  'userActions': {
+    doubleClick: false
+  },
   'plugins': {
     playlist: {},
     playlistButtonPlugin: {},
@@ -41,6 +44,7 @@ api.player = videojs('video-player', {
     seekButtonsPlugin: api.config.seek,
     stopButtonPlugin: {},
     loopButtonPlugin: {},
+    shuffleButtonPlugin: {},
     historyPlugin: {},
     waveSurferPlugin: {
       waveColor: 'rgba(115,133,159,.75)',
@@ -53,13 +57,16 @@ api.player = videojs('video-player', {
   }
 }, () => {
   document.title = api.config.name;
+
   if (api.arguments.src) {
     api.remote([api.arguments.src]);
   }
   api.player.playlist.autoadvance(api.config.delay);
   api.player.playlist.repeat(api.config.repeat);
 
-  api.player.playlistUi(document.getElementById('playlist'));
+  api.player.playlistUi({
+    el: document.getElementById('playlist')
+  });
 });
 
 api.player.bigPlayButton.on('click', () => {
@@ -115,6 +122,7 @@ api.local = files => {
   api.append(playlist);
 };
 api.remote = async urls => {
+  document.title = 'Please wait...';
   const playlist = urls.map(src => {
     if (/google\.[^./]+\/url?/.test(src)) {
       const tmp = /url=([^&]+)/.exec(src);
@@ -132,6 +140,11 @@ api.remote = async urls => {
 
   await Promise.all(playlist.map(o => {
     const controller = new AbortController();
+
+    if (o.sources[0].src.startsWith('https://www.youtube.com/watch?v=')) {
+      o.sources[0].type = 'video/youtube';
+      return Promise.resolve();
+    }
     return fetch(o.sources[0].src, {
       signal: controller.signal
     }).then(r => {
@@ -141,7 +154,6 @@ api.remote = async urls => {
       }
     }).catch(e => console.warn('cannot extract content-type', e)).finally(() => controller.abort());
   }));
-
   api.append(playlist);
 };
 // api.toast

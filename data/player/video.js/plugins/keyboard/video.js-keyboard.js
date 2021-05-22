@@ -16,8 +16,8 @@
           navigator.mediaSession.metadata = new MediaMetadata({
             title: document.title
           });
-          navigator.mediaSession.setActionHandler('nexttrack', api.player.playlist.currentItem() < api.player.playlist().length - 1 ? () => api.next() : null);
-          navigator.mediaSession.setActionHandler('previoustrack', api.player.playlist.currentIndex_ !== 0 ? () => api.previous() : null);
+          navigator.mediaSession.setActionHandler('nexttrack', api.player.playlist().length ? () => api.next() : null);
+          navigator.mediaSession.setActionHandler('previoustrack', api.player.playlist().length ? () => api.previous() : null);
           navigator.mediaSession.setActionHandler('seekbackward', () => {
             player.seekProgress('backward', 0);
           });

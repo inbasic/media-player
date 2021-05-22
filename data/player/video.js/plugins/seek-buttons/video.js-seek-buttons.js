@@ -20,6 +20,10 @@
       };
 
       player.on('ready', () => {
+        if (player.controlBar.forward) {
+          return;
+        }
+
         // Subclass the component (see 'extend' doc for more info)
         const SeekButton = videojs.extend(Button, {
           handleClick: function() {
@@ -32,17 +36,19 @@
         // Register the new component
         Button.registerComponent('seekButton', SeekButton);
         // forward
-        const forward = player.controlBar.addChild('seekButton', {
+        const forward = player.controlBar.forward = player.controlBar.addChild('seekButton', {
           direction: 'forward'
         });
+        forward.el().title = 'Step Forward';
         player.controlBar.el().insertBefore(
           forward.el(),
           player.controlBar.el().firstChild.nextSibling
         );
         // backward
-        const backward = player.controlBar.addChild('seekButton', {
+        const backward = player.controlBar.backward = player.controlBar.addChild('seekButton', {
           direction: 'backward'
         });
+        backward.el().title = 'Step Backward';
         player.controlBar.el().insertBefore(
           backward.el(),
           player.controlBar.el().firstChild.nextSibling

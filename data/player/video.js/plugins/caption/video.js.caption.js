@@ -117,6 +117,9 @@
         }
       });
       player.on('ready', () => {
+        if (player.controlBar.ccButton) {
+          return;
+        }
         // Subclass the component (see 'extend' doc for more info)
         const CC = videojs.extend(Button, {
           handleClick: function() {
@@ -139,7 +142,7 @@
         });
         // Register the new component
         Button.registerComponent('ccButton', CC);
-        button = player.controlBar.addChild('ccButton');
+        button = player.controlBar.ccButton = player.controlBar.addChild('ccButton');
         button.el().innerText = '+CC';
         button.el().title = 'Add Subtitle';
         player.controlBar.el().insertBefore(

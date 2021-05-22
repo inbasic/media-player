@@ -3,5 +3,5 @@
 
   <circle cx="60" cy="53" r="20" fill="#fff" />
 
-  <text x="60" y="55" class="small" alignment-baseline="middle" text-anchor="middle" style="font: bold 35px sans-serif;" fill="#000">1</text>
+  <text x="50" y="65" class="small" style="font: bold 35px sans-serif;" fill="#000">1</text>
 </svg>

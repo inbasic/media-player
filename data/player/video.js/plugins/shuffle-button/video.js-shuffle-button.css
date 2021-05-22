@@ -1,0 +1,6 @@
+.vjs-shuffle-button .vjs-icon-placeholder::before {
+  content: '';
+  background: url('shuffle.svg') center center no-repeat;
+  background-size: 50%;
+  cursor: pointer;
+}

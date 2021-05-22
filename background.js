@@ -64,11 +64,13 @@ chrome.browserAction.onClicked.addListener(() => {
     allFrames: true,
     matchAboutBlank: true,
     code: `[...document.querySelectorAll('video, audio, source')].map(e => {
-      try {
-        e.pause();
+      if (e.src && e.src.startsWith('http')) {
+        try {
+          e.pause();
+        }
+        catch (e) {}
+        return e.src;
       }
-      catch (e) {}
-      return e.src;
     })`
   }, results => {
     const lastError = chrome.runtime.lastError;
@@ -122,10 +124,11 @@ window.save = prefs => {
     id: 'open-src',
     title: 'Open in Media Player',
     contexts: ['video', 'audio'],
-    documentUrlPatterns: ['*://*/*']
+    documentUrlPatterns: ['*://*/*'],
+    targetUrlPatterns: ['*://*/*']
   });
   chrome.contextMenus.create({
-    title: 'Play with Video Player',
+    title: 'Play with Media Player',
     id: 'play-link',
     contexts: ['link'],
     targetUrlPatterns: [

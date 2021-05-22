@@ -8,6 +8,13 @@
     constructor(player, options) {
       super(player, options);
 
+      player.on('dblclick', e => {
+        if (e.target.closest('.vjs-control-bar')) {
+          return;
+        }
+        player[player.isFullscreen() ? 'exitFullscreen' : 'requestFullscreen']();
+      });
+
       {
         let last = 0;
         document.body.addEventListener('mousewheel', e => {
@@ -41,9 +48,6 @@
           }
         }, {passive: true});
       }
-      document.addEventListener('dblclick', () => {
-        player[player.isFullscreen() ? 'exitFullscreen' : 'requestFullscreen']();
-      });
     }
   }
   videojs.registerPlugin('mousePlugin', MousePlugin);

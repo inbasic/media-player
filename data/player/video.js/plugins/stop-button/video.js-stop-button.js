@@ -23,6 +23,10 @@
       };
 
       player.on('ready', () => {
+        if (player.controlBar.stopButton) {
+          return;
+        }
+
         // Subclass the component (see 'extend' doc for more info)
         const StopButton = videojs.extend(Button, {
           handleClick: () => player.stop(),
@@ -32,6 +36,7 @@
         Button.registerComponent('stopButton', StopButton);
         // forward
         const stopButton = player.controlBar.stopButton = player.controlBar.addChild('stopButton');
+        stopButton.el().title = 'Stop';
         player.controlBar.el().insertBefore(
           stopButton.el(),
           player.controlBar.el().firstChild.nextSibling

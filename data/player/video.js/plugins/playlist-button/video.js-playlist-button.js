@@ -10,6 +10,10 @@
       super(player, options);
 
       player.on('ready', () => {
+        if (player.controlBar.playlistButton) {
+          return;
+        }
+
         // Subclass the component (see 'extend' doc for more info)
         const PlaylistButton = videojs.extend(Button, {
           handleClick: () => player.playlistMenu.toggleClass('vjs-hidden'),
@@ -18,7 +22,8 @@
         // Register the new component
         Button.registerComponent('playlistButton', PlaylistButton);
         // playlist
-        const playlist = player.controlBar.addChild('playlistButton');
+        const playlist = player.controlBar.playlistButton = player.controlBar.addChild('playlistButton');
+        playlist.el().title = 'Playlist';
         player.controlBar.el().insertBefore(
           playlist.el(),
           player.controlBar.el().lastChild.previousSibling

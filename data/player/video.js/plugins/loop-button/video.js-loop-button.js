@@ -11,6 +11,10 @@
       super(player, options);
 
       player.on('ready', () => {
+        if (player.controlBar.loopButton) {
+          return;
+        }
+
         const one = e => {
           player.playlist.autoadvance(undefined);
           player.playlist.repeat(false);

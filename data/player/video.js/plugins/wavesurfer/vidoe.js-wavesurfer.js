@@ -35,6 +35,7 @@
         seekTo() {}
       };
       player.on('loadedmetadata', () => {
+        div.textContent = '';
         const index = player.playlist.currentItem();
         if (index > -1) {
           const src = player.playlist()[index].sources[0];
