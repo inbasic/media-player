@@ -91,30 +91,28 @@ api.append = list => {
   api.player.play();
 };
 api.local = files => {
-  const playlist = files
-    .filter(f => {
-      if (f.type) {
-        return f.type.startsWith('video/') || f.type.startsWith('audio/');
-      }
-      else {
-        return exts.some(e => f.name.toLowerCase().indexOf('.' + e) !== -1);
-      }
-    })
-    .map(file => {
-      // looking for subtitles
-      const base = file.name.replace(/\.[^.]*$/, '');
-      const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
-      return {
-        name: file.name.replace(/\.[^.]+$/, ''),
-        duration: '--',
-        type: file.type,
-        caption,
-        sources: [{
-          src: URL.createObjectURL(file),
-          type: file.type
-        }]
-      };
-    });
+  const playlist = files.filter(f => {
+    if (f.type) {
+      return f.type.startsWith('video/') || f.type.startsWith('audio/');
+    }
+    else {
+      return exts.some(e => f.name.toLowerCase().indexOf('.' + e) !== -1);
+    }
+  }).map(file => {
+    // looking for subtitles
+    const base = file.name.replace(/\.[^.]*$/, '');
+    const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
+    return {
+      name: file.name.replace(/\.[^.]+$/, ''),
+      duration: '--',
+      type: file.type,
+      caption,
+      sources: [{
+        src: URL.createObjectURL(file),
+        type: file.type
+      }]
+    };
+  });
   api.append(playlist);
 };
 api.remote = async urls => {

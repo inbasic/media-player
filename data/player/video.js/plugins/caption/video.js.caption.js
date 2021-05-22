@@ -3,9 +3,9 @@
 
 // api.srt2webvtt
 {
-  function convertSrtCue(caption) {
+  const convertSrtCue = caption => {
     // remove all html tags for security reasons
-    //srt = srt.replace(/<[a-zA-Z\/][^>]*>/g, '');
+    // srt = srt.replace(/<[a-zA-Z\/][^>]*>/g, '');
 
     let cue = '';
     const s = caption.split(/\n/);
@@ -45,7 +45,7 @@
     }
 
     return cue;
-  }
+  };
 
   const srt2webvtt = data => {
     // remove dos newlines
@@ -59,7 +59,7 @@
 
     if (cuelist.length > 0) {
       result += 'WEBVTT\n\n';
-      for (var i = 0; i < cuelist.length; i += 1) {
+      for (let i = 0; i < cuelist.length; i += 1) {
         result += convertSrtCue(cuelist[i]);
       }
     }
@@ -68,6 +68,7 @@
   };
 
   const Plugin = videojs.getPlugin('plugin');
+  const Button = videojs.getComponent('Button');
 
   class CaptionPlugin extends Plugin {
     constructor(player, options) {
@@ -77,9 +78,11 @@
         player.addRemoteTextTrack({
           default: true,
           src,
-          label: 'English',
+          label: 'Subtitle',
           mode: 'showing'
         }, false);
+
+        button.hide();
         window.setTimeout(() => URL.revokeObjectURL(src), 1000);
       };
 
@@ -98,6 +101,8 @@
           reader.readAsText(file);
         }
       };
+
+      let button;
       player.on('loadstart', () => {
         const index = player.playlist.currentItem();
         if (index > -1) {
@@ -106,7 +111,42 @@
           if (caption) {
             player.caption(caption);
           }
+          else {
+            button.show();
+          }
         }
+      });
+      player.on('ready', () => {
+        // Subclass the component (see 'extend' doc for more info)
+        const CC = videojs.extend(Button, {
+          handleClick: function() {
+            const index = player.playlist.currentItem();
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'text/vtt|text/srt';
+            input.onchange = () => {
+              const file = input.files[0];
+              if (file) {
+                player.caption(file);
+                player.playlist()[index].caption = file;
+              }
+            };
+            input.click();
+          },
+          buildCSSClass: function() {
+            return 'vjs-subs-caps-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
+          }
+        });
+        // Register the new component
+        Button.registerComponent('ccButton', CC);
+        button = player.controlBar.addChild('ccButton');
+        button.el().innerText = '+CC';
+        button.el().title = 'Add Subtitle';
+        console.log(button, player);
+        player.controlBar.el().insertBefore(
+          button.el(),
+          player.controlBar.chaptersButton.el()
+        );
       });
     }
   }
