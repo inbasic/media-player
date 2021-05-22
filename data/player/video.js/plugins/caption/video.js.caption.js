@@ -142,7 +142,6 @@
         button = player.controlBar.addChild('ccButton');
         button.el().innerText = '+CC';
         button.el().title = 'Add Subtitle';
-        console.log(button, player);
         player.controlBar.el().insertBefore(
           button.el(),
           player.controlBar.chaptersButton.el()

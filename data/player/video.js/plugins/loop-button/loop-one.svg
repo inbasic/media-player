@@ -1,0 +1,7 @@
+<svg version="1.1" viewBox="0 0 90 70" xmlns="http://www.w3.org/2000/svg">
+  <path d="M80,11H61v14h15v21H14V25h21v11l20-18L35,0v11H10C4.477,11,0,15.477,0,21v29c0,5.523,4.477,10,10,10h70  c5.523,0,10-4.477,10-10V21C90,15.477,85.523,11,80,11z" fill="#fff"/>
+
+  <circle cx="60" cy="53" r="20" fill="#fff" />
+
+  <text x="60" y="55" class="small" alignment-baseline="middle" text-anchor="middle" style="font: bold 35px sans-serif;" fill="#000">1</text>
+</svg>

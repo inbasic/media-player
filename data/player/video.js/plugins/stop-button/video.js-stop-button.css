@@ -1,4 +1,4 @@
-.vjs-stop-button .vjs-icon-placeholder:before {
+.vjs-stop-button .vjs-icon-placeholder::before {
   content: '';
   background: url('stop.svg') center center no-repeat;
   background-size: 30%;

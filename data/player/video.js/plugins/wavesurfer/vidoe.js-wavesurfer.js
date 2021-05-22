@@ -41,7 +41,7 @@
           // console.log(src);
           // only load for audio
           const video = player.el().querySelector('video');
-          if (src.type.startsWith('audio/') || (video.videoWidth === 0 && video.videoHeight === 0)) {
+          if (src.type && src.type.startsWith('audio/') || (video.videoWidth === 0 && video.videoHeight === 0)) {
             wavesurfer = WaveSurfer.create({
               container: div,
               waveColor: options.waveColor,
@@ -56,7 +56,6 @@
           }
           else {
             wavesurfer.destroy();
-            console.log('done');
           }
           div.style.visibility = 'hidden';
         }

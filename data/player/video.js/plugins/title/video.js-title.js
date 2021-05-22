@@ -23,6 +23,10 @@
           // toast
           api.toast(name);
         }
+        else {
+          document.title = api.config.name;
+          delete document.body.dataset.type;
+        }
       });
     }
   }

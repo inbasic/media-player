@@ -15,8 +15,6 @@ const api = {
       backward: [10, 30]
     },
     inactivityTimeout: 4,
-    delay: 2,
-    repeat: true,
     playbackRates: [0.5, 1, 1.5, 2, 5]
   }
 };
@@ -42,6 +40,7 @@ api.player = videojs('video-player', {
     captionPlugin: {},
     seekButtonsPlugin: api.config.seek,
     stopButtonPlugin: {},
+    loopButtonPlugin: {},
     historyPlugin: {},
     waveSurferPlugin: {
       waveColor: 'rgba(115,133,159,.75)',

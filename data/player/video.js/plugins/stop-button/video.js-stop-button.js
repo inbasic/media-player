@@ -9,7 +9,18 @@
     constructor(player, options) {
       super(player, options);
 
-      player.stop = () => window.location.reload();
+      player.stop = () => {
+        // player.pause();
+        // player.currentTime(0);
+        // player.controlBar.hide();
+        // player.bigPlayButton.show();
+        // player.posterImage.show();
+        // player.poster('poster/1920x1200.jpg');
+        // player.hasStarted(false);
+        // player.playlist([]);
+        // player.trigger('loadstart');
+        location.replace(location.href.split('?')[0]);
+      };
 
       player.on('ready', () => {
         // Subclass the component (see 'extend' doc for more info)
@@ -20,9 +31,9 @@
         // Register the new component
         Button.registerComponent('stopButton', StopButton);
         // forward
-        const forward = player.controlBar.addChild('stopButton');
+        const stopButton = player.controlBar.stopButton = player.controlBar.addChild('stopButton');
         player.controlBar.el().insertBefore(
-          forward.el(),
+          stopButton.el(),
           player.controlBar.el().firstChild.nextSibling
         );
       });
