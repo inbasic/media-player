@@ -1,0 +1,10 @@
+.vjs-boost-button .vjs-icon-placeholder::before {
+  content: '';
+  background: url('boost.svg') center center no-repeat;
+  background-size: 45%;
+  cursor: pointer;
+  opacity: 0.2;
+}
+.vjs-boost-button.active .vjs-icon-placeholder::before {
+  opacity: 1;
+}

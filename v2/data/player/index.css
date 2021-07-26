@@ -68,3 +68,18 @@ button {
 .video-js .vjs-picture-in-picture-control {
   display: none !important;
 }
+
+@media screen and (max-width: 600px) {
+  .vjs-loop-button,
+  .vjs-shuffle-button,
+  .vjs-subs-caps-button,
+  .vjs-boost-button,
+  .vjs-screenshot-button {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 500px) {
+  .vjs-seek-button {
+    display: none !important;
+  }
+}

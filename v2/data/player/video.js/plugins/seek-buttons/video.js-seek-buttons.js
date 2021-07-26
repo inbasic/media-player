@@ -39,7 +39,7 @@
         const forward = player.controlBar.forward = player.controlBar.addChild('seekButton', {
           direction: 'forward'
         });
-        forward.el().title = 'Step Forward';
+        forward.el().title = 'Step Forward (→)';
         player.controlBar.el().insertBefore(
           forward.el(),
           player.controlBar.el().firstChild.nextSibling
@@ -48,7 +48,7 @@
         const backward = player.controlBar.backward = player.controlBar.addChild('seekButton', {
           direction: 'backward'
         });
-        backward.el().title = 'Step Backward';
+        backward.el().title = 'Step Backward (←)';
         player.controlBar.el().insertBefore(
           backward.el(),
           player.controlBar.el().firstChild.nextSibling

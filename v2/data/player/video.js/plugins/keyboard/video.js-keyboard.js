@@ -37,8 +37,20 @@
         case 'KeyP':
           api.previous();
           break;
+        case 'KeyR':
+          player.toggleLoop();
+          break;
+        case 'KeyB':
+          player.toggleBoost();
+          break;
         case 'KeyN':
           api.next();
+          break;
+        case 'KeyS':
+          player.snap();
+          break;
+        case 'KeyU':
+          player.shuffle();
           break;
         case 'KeyF':
           player[player.isFullscreen() ? 'exitFullscreen' : 'requestFullscreen']();

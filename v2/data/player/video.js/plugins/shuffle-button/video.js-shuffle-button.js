@@ -14,11 +14,15 @@
           return;
         }
 
+        player.shuffle = function() {
+          player.playlist.shuffle(true);
+          api.next();
+        };
+
         // Subclass the component (see 'extend' doc for more info)
         const ShuffleButton = videojs.extend(Button, {
           handleClick: () => {
-            player.playlist.shuffle(true);
-            api.next();
+            player.shuffle();
           },
           buildCSSClass: () => 'vjs-control vjs-button vjs-shuffle-button'
         });
@@ -26,7 +30,7 @@
         Button.registerComponent('shuffleButton', ShuffleButton);
         // forward
         const shuffleButton = player.controlBar.shuffleButton = player.controlBar.addChild('shuffleButton');
-        shuffleButton.el().title = 'Shuffle';
+        shuffleButton.el().title = 'Shuffle (U)';
         player.controlBar.el().insertBefore(
           shuffleButton.el(),
           player.controlBar.stopButton.el().nextSibling

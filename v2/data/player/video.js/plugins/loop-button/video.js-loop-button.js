@@ -19,22 +19,35 @@
           player.playlist.autoadvance(undefined);
           player.playlist.repeat(false);
           e.classList.add('one', 'active');
-          e.title = 'Loop (one track)';
+          e.title = 'Loop (one track) (R)';
           localStorage.setItem('loop', 'one');
         };
         const on = e => {
           player.playlist.autoadvance(2);
           player.playlist.repeat(true);
           e.classList.add('active');
-          e.title = 'Loop (on)';
+          e.title = 'Loop (on) (R)';
           localStorage.setItem('loop', 'true');
         };
         const off = e => {
           player.playlist.repeat(false);
           player.playlist.autoadvance(undefined);
           e.classList.remove('active', 'one');
-          e.title = 'Loop (off)';
+          e.title = 'Loop (off) (R)';
           localStorage.setItem('loop', 'false');
+        };
+
+        player.toggleLoop = function() {
+          const e = loop.el();
+          if (e.classList.contains('one')) {
+            off(e);
+          }
+          else if (e.classList.contains('active')) {
+            one(e);
+          }
+          else {
+            on(e);
+          }
         };
 
         // Subclass the component (see 'extend' doc for more info)
@@ -42,16 +55,7 @@
           handleClick: ev => {
             ev.preventDefault();
             ev.stopPropagation();
-            const e = loop.el();
-            if (e.classList.contains('one')) {
-              off(e);
-            }
-            else if (e.classList.contains('active')) {
-              one(e);
-            }
-            else {
-              on(e);
-            }
+            player.toggleLoop();
           },
           buildCSSClass: () => 'vjs-control vjs-button vjs-loop-button',
           text: 'Loop'

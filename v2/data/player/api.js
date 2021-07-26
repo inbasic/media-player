@@ -43,6 +43,8 @@ api.player = videojs('video-player', {
     captionPlugin: {},
     seekButtonsPlugin: api.config.seek,
     stopButtonPlugin: {},
+    screenshotButtonPlugin: {},
+    boostButtonPlugin: {},
     loopButtonPlugin: {},
     shuffleButtonPlugin: {},
     historyPlugin: {},
@@ -168,6 +170,10 @@ api.remote = async urls => {
     elem.textContent = msg;
     id = window.setTimeout(() => elem.textContent = '', options.timeout * 1000);
   };
+  api.player.on('ready', () => {
+    const video = api.player.el().querySelector('video');
+    video.insertAdjacentElement('afterEnd', elem);
+  });
 }
 
 // api.background
