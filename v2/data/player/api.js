@@ -1,5 +1,5 @@
-/* globals videojs */
 'use strict';
+/* globals videojs */
 
 const exts = [
   'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv', 'vob',
@@ -15,7 +15,7 @@ const api = {
       backward: [10, 30]
     },
     inactivityTimeout: 4,
-    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2').split(/\s*,\s*/)
+    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2').split(/\s*,\s*/).map(Number)
   }
 };
 window.api = api;
@@ -25,7 +25,6 @@ if (window.location.search) {
     api.arguments[tmp[0]] = decodeURIComponent(tmp[1]);
   });
 }
-
 api.player = videojs('video-player', {
   'fluid': true,
   'playbackRates': api.config.playbackRates,

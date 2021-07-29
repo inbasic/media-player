@@ -68,6 +68,10 @@ button {
 .video-js .vjs-picture-in-picture-control {
   display: none !important;
 }
+.vjs-playback-rate .vjs-playback-rate-value {
+  font-size: 100% !important;
+  line-height: 3 !important;
+}
 
 @media screen and (max-width: 600px) {
   .vjs-loop-button,
