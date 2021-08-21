@@ -181,20 +181,24 @@ chrome.contextMenus.onClicked.addListener(info => {
     });
   }
   else if (info.menuItemId === 'open-src') {
-    onCommand({
+    chrome.permissions.request({
+      origins: [info.srcUrl]
+    }, granted => granted && onCommand({
       src: info.srcUrl
     }).then(t => chrome.tabs.sendMessage(t.id, {
       method: 'open-src',
       src: info.srcUrl
-    }));
+    })));
   }
   else if (info.menuItemId === 'play-link') {
-    onCommand({
+    chrome.permissions.request({
+      origins: [info.linkUrl]
+    }, granted => granted && onCommand({
       src: info.linkUrl
     }).then(t => chrome.tabs.sendMessage(t.id, {
       method: 'open-src',
       src: info.linkUrl
-    }));
+    })));
   }
   else {
     find().then(t => chrome.tabs.sendMessage(t.id, {

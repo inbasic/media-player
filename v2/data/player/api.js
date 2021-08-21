@@ -97,6 +97,20 @@ api.append = list => {
   api.player.playlist([...olist, ...list], olist.length);
   api.player.play();
 };
+
+const dtype = type => {
+  if (!type) {
+    return 'video/mp4';
+  }
+  // https://filesamples.com/formats/mkv
+  if (type.startsWith('application/')) {
+    return 'video/mp4';
+  }
+  if (type.startsWith('video/mkv')) {
+    return 'video/mp4';
+  }
+}
+
 api.local = files => {
   const playlist = files.filter(f => {
     if (f.type) {
@@ -109,14 +123,15 @@ api.local = files => {
     // looking for subtitles
     const base = file.name.replace(/\.[^.]*$/, '');
     const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
+
     return {
       name: file.name.replace(/\.[^.]+$/, ''),
       duration: '--',
-      type: file.type,
+      type: dtype(file.type),
       caption,
       sources: [{
         src: URL.createObjectURL(file),
-        type: file.type
+        type: dtype(file.type)
       }]
     };
   });
@@ -150,11 +165,10 @@ api.remote = async urls => {
       signal: controller.signal
     }).then(r => {
       const type = r.headers.get('content-type');
-      if (type) {
-        o.sources[0].type = type;
-      }
+      o.sources[0].type = dtype(type);
     }).catch(e => console.warn('cannot extract content-type', e)).finally(() => controller.abort());
   }));
+  console.log(playlist);
   api.append(playlist);
 };
 // api.toast
