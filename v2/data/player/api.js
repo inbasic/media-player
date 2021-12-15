@@ -7,6 +7,10 @@ const exts = [
 ];
 
 const api = {
+  e: document.createElement('video'),
+  validate(type) {
+    return api.e.canPlayType(type);
+  },
   arguments: {},
   config: {
     name: 'Media Player',
@@ -70,6 +74,10 @@ api.player = videojs('video-player', {
   });
 });
 
+api.player.on('error', e => {
+  console.warn('Error', e);
+});
+
 api.player.bigPlayButton.on('click', () => {
   const input = document.createElement('input');
   input.type = 'file';
@@ -98,18 +106,17 @@ api.append = list => {
   api.player.play();
 };
 
-const dtype = type => {
-  if (!type) {
+const dtype = (type = '') => {
+  if (type === '') {
     return 'video/mp4';
   }
-  // https://filesamples.com/formats/mkv
-  if (type.startsWith('application/')) {
-    return 'video/mp4';
+  if (type.startsWith('application/') || type.startsWith('video/')) {
+    if (!api.validate(type)) {
+      return 'video/mp4';
+    }
   }
-  if (type.startsWith('video/mkv')) {
-    return 'video/mp4';
-  }
-}
+  return type;
+};
 
 api.local = files => {
   const playlist = files.filter(f => {
@@ -168,7 +175,6 @@ api.remote = async urls => {
       o.sources[0].type = dtype(type);
     }).catch(e => console.warn('cannot extract content-type', e)).finally(() => controller.abort());
   }));
-  console.log(playlist);
   api.append(playlist);
 };
 // api.toast
