@@ -76,14 +76,21 @@ api.player = videojs('video-player', {
 
 api.player.on('error', e => {
   console.warn('Error', e);
+  document.title = e.message || 'Error';
 });
 
-api.player.bigPlayButton.on('click', () => {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.setAttribute('multiple', true);
-  input.addEventListener('change', () => api.local([...input.files]));
-  input.click();
+api.player.bigPlayButton.el_.title = 'Click: Open local resources\nShift + Click: Open remote resources';
+api.player.bigPlayButton.on('click', e => {
+  if (e.shiftKey) {
+    api.remote.prompt();
+  }
+  else {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.setAttribute('multiple', true);
+    input.addEventListener('change', () => api.local([...input.files]));
+    input.click();
+  }
 });
 
 // api.next
@@ -176,6 +183,12 @@ api.remote = async urls => {
     }).catch(e => console.warn('cannot extract content-type', e)).finally(() => controller.abort());
   }));
   api.append(playlist);
+};
+api.remote.prompt = () => {
+  const links = prompt('Comma-separated list of network URLs');
+  if (links) {
+    api.remote(links.split(/\s*,\s*/));
+  }
 };
 // api.toast
 {

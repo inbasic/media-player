@@ -31,6 +31,9 @@
       document.body.addEventListener('keydown', ({code, shiftKey}) => {
         // console.log(code)
         switch (code) {
+        case 'KeyO':
+          api.remote.prompt();
+          break;
         case 'Space':
           player.toggle();
           break;
@@ -71,9 +74,10 @@
 
       player.on('ready', () => {
         if (!('src' in api.arguments)) {
-          api.toast(`Drop a video file to start
+          api.toast(`Drop a video file to start or click on the "Play button"
 
 Space: Toggle play/pause
+O Key: Open a network URL
 F Key: Toggle fullscreen
 N Key: Next track
 P Key: Previous track
