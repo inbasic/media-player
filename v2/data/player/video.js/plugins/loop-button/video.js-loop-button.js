@@ -1,10 +1,9 @@
-/* globals videojs */
+/* globals videojs, api */
 'use strict';
 
 {
   const Plugin = videojs.getPlugin('plugin');
   const Button = videojs.getComponent('Button');
-  const TIMEOUT = 2;
 
   class LoopButtonPlugin extends Plugin {
     constructor(player, options) {
@@ -23,7 +22,7 @@
           localStorage.setItem('loop', 'one');
         };
         const on = e => {
-          player.playlist.autoadvance(2);
+          player.playlist.autoadvance(api.config.delay);
           player.playlist.repeat(true);
           e.classList.add('active');
           e.title = 'Loop (on) (R)';
@@ -31,7 +30,7 @@
         };
         const off = e => {
           player.playlist.repeat(false);
-          player.playlist.autoadvance(undefined);
+          player.playlist.autoadvance(api.config.delay);
           e.classList.remove('active', 'one');
           e.title = 'Loop (off) (R)';
           localStorage.setItem('loop', 'false');
@@ -39,6 +38,7 @@
 
         player.toggleLoop = function() {
           const e = loop.el();
+
           if (e.classList.contains('one')) {
             off(e);
           }
@@ -66,7 +66,7 @@
             if (player.paused() && loop.el().classList.contains('one')) {
               player.play();
             }
-          }, TIMEOUT * 1000);
+          }, api.config.delay * 1000);
         });
 
         // Register the new component

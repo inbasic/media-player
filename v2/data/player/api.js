@@ -19,7 +19,8 @@ const api = {
       backward: [10, 30]
     },
     inactivityTimeout: 4,
-    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2').split(/\s*,\s*/).map(Number)
+    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2').split(/\s*,\s*/).map(Number),
+    delay: Number(localStorage.getItem('delay') || '1') // seconds
   }
 };
 window.api = api;
@@ -66,8 +67,6 @@ api.player = videojs('video-player', {
   if (api.arguments.src) {
     api.remote([api.arguments.src]);
   }
-  api.player.playlist.autoadvance(api.config.delay);
-  api.player.playlist.repeat(api.config.repeat);
 
   api.player.playlistUi({
     el: document.getElementById('playlist')

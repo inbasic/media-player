@@ -28,7 +28,7 @@
         catch (e) {}
       });
 
-      document.body.addEventListener('keydown', ({code, shiftKey}) => {
+      document.body.addEventListener('keydown', ({code, shiftKey, ctrlKey, metaKey}) => {
         // console.log(code)
         switch (code) {
         case 'KeyO':
@@ -41,7 +41,9 @@
           api.previous();
           break;
         case 'KeyR':
-          player.toggleLoop();
+          if (ctrlKey === false && metaKey === false) {
+            player.toggleLoop();
+          }
           break;
         case 'KeyB':
           player.toggleBoost();
