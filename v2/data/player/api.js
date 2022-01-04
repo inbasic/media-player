@@ -15,8 +15,8 @@ const api = {
   config: {
     name: 'Media Player',
     seek: {
-      forward: [10, 30],
-      backward: [10, 30]
+      forward: (localStorage.getItem('seek.forward') || '10, 30').split(/\s*,\s*/).map(Number),
+      backward: (localStorage.getItem('seek.backward') || '10, 30').split(/\s*,\s*/).map(Number)
     },
     inactivityTimeout: 4,
     playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2').split(/\s*,\s*/).map(Number),
