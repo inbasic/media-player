@@ -75,8 +75,14 @@ api.player = videojs('video-player', {
 });
 
 api.player.on('error', e => {
-  console.warn('Error', e);
-  document.title = e.message || 'Error';
+  setTimeout(() => {
+    if (api.player.playlist.next()) {
+      api.player.play();
+    }
+  }, 5000);
+
+  console.warn('Error', e, api.player.error());
+  document.title = api.player.error()?.message || 'Cannot Play this Track';
 });
 
 api.player.bigPlayButton.el_.title = 'Click: Open local resources\nShift + Click: Open remote resources';

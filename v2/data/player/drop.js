@@ -53,6 +53,8 @@ const drop = async es => {
     }
   }
 
+  console.log(files);
+
   return files;
 };
 
