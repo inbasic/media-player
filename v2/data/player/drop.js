@@ -12,13 +12,19 @@ const drop = async es => {
 
   const checkEntry = async entry => {
     const file = await new Promise(resolve => entry.file(resolve));
+    console.log(file);
+
     if (file.type) {
       if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
         files.push(file);
       }
     }
     else {
-      if (file.name.startsWith('.') === false) {
+      if (file.name.endsWith('.ts')) {
+        file.vtype = 'application/vnd.apple.mpegurl';
+        files.push(file);
+      }
+      else if (file.name.startsWith('.') === false) {
         files.push(file);
       }
     }

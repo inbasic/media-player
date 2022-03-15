@@ -116,6 +116,10 @@ const dtype = (type = '') => {
   if (type === '') {
     return 'video/mp4';
   }
+  // support M3U8
+  if (type.toLowerCase().includes('mpegurl')) {
+    return 'application/x-mpegURL';
+  }
   if (type.startsWith('application/') || type.startsWith('video/')) {
     if (!api.validate(type)) {
       return 'video/mp4';
