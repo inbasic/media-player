@@ -59,7 +59,8 @@ api.player = videojs('video-player', {
     },
     smartInactivePlugin: {
       inactivityTimeout: api.config.inactivityTimeout * 1000
-    }
+    },
+    playBackRatePlugin: {}
   }
 }, () => {
   document.title = api.config.name;
