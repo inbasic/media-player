@@ -13,7 +13,6 @@
         playrate = player.playbackRate();
       });
       player.on('playlistitem', function() {
-        console.log(123, playrate);
         player.playbackRate(playrate);
       });
     }
