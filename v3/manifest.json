@@ -34,13 +34,13 @@
   "commands": {
     "_execute_action": {},
     "previous-track": {
-      "description": "Previous track"
+      "description": "Previous Track"
     },
     "next-track": {
-      "description": "Next track"
+      "description": "Next Track"
     },
     "toggle-play": {
-      "description": "Toggle play/pause"
+      "description": "Toggle Play/Pause"
     }
   },
   "homepage_url": "https://add0n.com/the-media-player.html"

@@ -30,13 +30,11 @@ button {
   top: 80px;
   z-index: 2147483647;
   color: #fff;
-  font-size: 160%;
   line-height: 160%;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 4px;
   padding: 5px 20px;
   white-space: pre;
-
 }
 #toast:empty {
   display: none;

@@ -1,5 +1,5 @@
 'use strict';
-/* globals videojs */
+/* global videojs */
 
 const exts = [
   'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv', 'vob',
@@ -82,7 +82,8 @@ api.player.on('error', e => {
   }, 5000);
 
   console.warn('Error', e, api.player.error());
-  document.title = api.player.error()?.message || 'Cannot Play this Track';
+  document.title = (api.player.error()?.message || 'Cannot Play this Track');
+  api.toast(api.player.currentSrc(), {timeout: 5});
 });
 
 api.player.bigPlayButton.el_.title = 'Click: Open local resources\nShift + Click: Open remote resources';
@@ -161,7 +162,12 @@ api.local = files => {
   });
   api.append(playlist);
 };
-api.remote = async urls => {
+api.remote = urls => chrome.runtime.sendMessage({
+  method: 'srcs'
+}, async r => {
+  urls.push(...r);
+  urls = urls.filter((s, i, l) => s && l.indexOf(s) === i);
+
   document.title = 'Please wait...';
   const playlist = urls.map(src => {
     if (/google\.[^./]+\/url?/.test(src)) {
@@ -193,7 +199,8 @@ api.remote = async urls => {
     }).catch(e => console.warn('cannot extract content-type', e)).finally(() => controller.abort());
   }));
   api.append(playlist);
-};
+});
+
 api.remote.prompt = () => {
   const links = prompt('Comma-separated list of network URLs');
   if (links) {

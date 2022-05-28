@@ -1,4 +1,4 @@
-/* globals api */
+/* global api */
 'use strict';
 
 // resize
@@ -35,15 +35,11 @@ if (chrome.runtime && chrome.runtime.onMessage) {
       api.player.toggle();
       response(true);
     }
+    else if (request.method === 'exists') {
+      response(true);
+      chrome.runtime.sendMessage({
+        method: 'bring-to-front'
+      });
+    }
   });
 }
-
-// port
-chrome.runtime.onMessage.addListener((request, sender, response) => {
-  if (request.method === 'exists') {
-    response(true);
-    chrome.runtime.sendMessage({
-      method: 'bring-to-front'
-    });
-  }
-});

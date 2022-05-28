@@ -1,5 +1,10 @@
 'use strict';
 
+const FORMATS = [
+  'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv', 'vob',
+  'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc', 'm3u8'
+];
+
 const notify = message => chrome.notifications.create({
   type: 'basic',
   iconUrl: '/data/icons/48.png',
@@ -21,76 +26,101 @@ const find = () => new Promise((resolve, reject) => {
   });
 });
 
-const onCommand = (options = {}) => find().then(() => {
-  if (options.src) {
-    chrome.runtime.sendMessage({
-      method: 'open-src',
-      src: options.src
-    });
-  }
-}).catch(() => new Promise(resolve => {
-  chrome.windows.getCurrent().then(win => {
-    chrome.storage.local.get({
-      'width': 800,
-      'height': 500,
-      'left': win.left + Math.round((win.width - 800) / 2),
-      'top': win.top + Math.round((win.height - 500) / 2),
-      'open-in-tab': false
-    }, prefs => {
-      const args = new URLSearchParams();
-      if (options.src) {
-        args.set('src', options.src);
-      }
-      args.set('mode', prefs['open-in-tab'] ? 'tab' : 'window');
+const onCommand = (options = {}) => {
+  onCommand.srcs = options.srcs || [];
 
-      const url = 'data/player/index.html?' + args.toString();
-      if (prefs['open-in-tab']) {
-        chrome.tabs.create({
-          url
-        }, resolve);
-      }
-      else {
-        delete prefs['open-in-tab'];
-        chrome.windows.create(Object.assign(prefs, {
-          url,
-          type: 'popup'
-        }), w => resolve(w.tabs[0]));
-      }
-    });
-  });
-}));
-
-chrome.action.onClicked.addListener(tab => {
-  const next = () => chrome.scripting.executeScript({
-    target: {
-      tabId: tab.id,
-      allFrames: true
-    },
-    func: () => [...document.querySelectorAll('video, audio, source')].map(e => {
-      if (e.src && e.src.startsWith('http')) {
-        try {
-          e.pause();
-        }
-        catch (e) {}
-        return e.src;
-      }
-    })
-  }).then(results => {
-    results = results.map(a => a.result).flat().filter(a => a);
-    console.log(results);
-    if (results.length) {
-      onCommand({
-        src: results[0]
+  find().then(() => {
+    if (options.src) {
+      chrome.runtime.sendMessage({
+        method: 'open-src',
+        src: options.src
       });
     }
-    else {
+  }).catch(() => new Promise(resolve => {
+    chrome.windows.getCurrent().then(win => {
+      chrome.storage.local.get({
+        'width': 800,
+        'height': 500,
+        'left': win.left + Math.round((win.width - 800) / 2),
+        'top': win.top + Math.round((win.height - 500) / 2),
+        'open-in-tab': false
+      }, prefs => {
+        const args = new URLSearchParams();
+        if (options.src) {
+          args.set('src', options.src);
+        }
+        args.set('mode', prefs['open-in-tab'] ? 'tab' : 'window');
+
+        const url = 'data/player/index.html?' + args.toString();
+        if (prefs['open-in-tab']) {
+          chrome.tabs.create({
+            url
+          }, resolve);
+        }
+        else {
+          delete prefs['open-in-tab'];
+          chrome.windows.create(Object.assign(prefs, {
+            url,
+            type: 'popup'
+          }), w => resolve(w.tabs[0]));
+        }
+      });
+    });
+  }));
+};
+
+chrome.action.onClicked.addListener(tab => {
+  const next = () => {
+    Promise.race([
+      chrome.scripting.executeScript({
+        target: {
+          tabId: tab.id,
+          allFrames: true
+        },
+        func: formats => {
+          const links = [];
+          [...document.querySelectorAll('video, audio, source')].map(e => {
+            if (e.src && e.src.startsWith('http')) {
+              try {
+                e.pause();
+              }
+              catch (e) {}
+              links.push(e.src);
+            }
+          });
+          for (const a of [...document.querySelectorAll('a')]) {
+            if (a.href && formats.some(s => a.href.includes('.' + s))) {
+              links.push(a.href);
+            }
+          }
+
+          return links;
+        },
+        args: [FORMATS]
+      }),
+      new Promise(resolve => setTimeout(resolve, 1000, []))
+    ]).then(results => {
+      results = results.map(a => a.result).flat().filter(a => a);
+
+      if (results.length) {
+        onCommand({
+          src: results[0],
+          srcs: results
+        });
+      }
+      else {
+        onCommand();
+      }
+    }).catch(() => onCommand());
+  };
+  chrome.storage.local.get({
+    'request-active-tab-2': true,
+    'capture-media': true
+  }, prefs => {
+    if (prefs['capture-media'] === false) {
       onCommand();
     }
-  }).catch(() => onCommand());
-  chrome.storage.local.get({
-    'request-active-tab-2': true
-  }, prefs => {
-    if (prefs['request-active-tab-2']) {
+    else if (prefs['request-active-tab-2']) {
       notify(`The extension can optionally find video links from the active tab when this button is pressed.
 This way the extension plays the media on its interface when the button is pressed.`);
       chrome.storage.local.set({
@@ -110,7 +140,7 @@ This way the extension plays the media on its interface when the button is press
   });
 });
 
-chrome.runtime.onMessage.addListener((request, sender) => {
+chrome.runtime.onMessage.addListener((request, sender, response) => {
   if (request.method === 'bring-to-front') {
     chrome.windows.update(sender.tab.windowId, {
       focused: true
@@ -121,6 +151,10 @@ chrome.runtime.onMessage.addListener((request, sender) => {
   }
   else if (request.method === 'save-size') {
     chrome.storage.local.set(request.size);
+  }
+  else if (request.method === 'srcs') {
+    response(onCommand.srcs || []);
+    onCommand.srcs = [];
   }
 });
 
@@ -140,48 +174,68 @@ chrome.runtime.onMessage.addListener((request, sender) => {
     title: 'Play with Media Player',
     id: 'play-link',
     contexts: ['link'],
-    targetUrlPatterns: [
-      'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv', 'vob',
-      'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc', 'm3u8'
-    ].map(a => '*://*/*.' + a),
+    targetUrlPatterns: FORMATS.map(a => '*://*/*.' + a),
     documentUrlPatterns: ['*://*/*']
   });
   chrome.contextMenus.create({
-    id: 'previous-track',
-    title: 'Previous track',
+    id: 'navigation',
+    title: 'Navigation',
     contexts: ['action']
+  });
+  chrome.contextMenus.create({
+    id: 'previous-track',
+    title: 'Previous Track',
+    contexts: ['action'],
+    parentId: 'navigation'
   });
   chrome.contextMenus.create({
     id: 'next-track',
-    title: 'Next track',
-    contexts: ['action']
+    title: 'Next Track',
+    contexts: ['action'],
+    parentId: 'navigation'
   });
   chrome.contextMenus.create({
     id: 'toggle-play',
-    title: 'Toggle play/pause',
-    contexts: ['action']
+    title: 'Toggle Play/Pause',
+    contexts: ['action'],
+    parentId: 'navigation'
   });
   chrome.contextMenus.create({
     id: 'test-audio',
     title: 'Test Playback',
     contexts: ['action']
   });
+  chrome.contextMenus.create({
+    id: 'options',
+    title: 'Options',
+    contexts: ['action']
+  });
   chrome.storage.local.get({
-    'open-in-tab': false
+    'open-in-tab': false,
+    'capture-media': true
   }, prefs => {
     chrome.contextMenus.create({
       id: 'open-in-tab',
       title: 'Open Player in Tab',
       contexts: ['action'],
       type: 'checkbox',
-      checked: prefs['open-in-tab']
+      checked: prefs['open-in-tab'],
+      parentId: 'options'
+    });
+    chrome.contextMenus.create({
+      id: 'capture-media',
+      title: 'Capture Media from Tab',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['capture-media'],
+      parentId: 'options'
     });
   });
 });
 chrome.contextMenus.onClicked.addListener(info => {
-  if (info.menuItemId === 'open-in-tab') {
+  if (info.menuItemId === 'open-in-tab' || info.menuItemId === 'capture-media') {
     chrome.storage.local.set({
-      'open-in-tab': info.checked
+      [info.menuItemId]: info.checked
     });
   }
   else if (info.menuItemId === 'test-audio') {
