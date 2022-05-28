@@ -1,0 +1,5 @@
+{
+  "description": {
+    "message": "A powerful media player built on top of the video.js project with HTTP Live Streaming (HSL), speed control, and playlist support"
+  }
+}

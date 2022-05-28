@@ -1,0 +1,14 @@
+.vjs-loop-button .vjs-icon-placeholder::before {
+  content: '';
+  background: url('loop.svg') center center no-repeat;
+  background-size: 40%;
+  cursor: pointer;
+  opacity: 0.2;
+}
+.vjs-loop-button.active .vjs-icon-placeholder::before {
+  opacity: 1;
+}
+.vjs-loop-button.active.one .vjs-icon-placeholder::before {
+  opacity: 1;
+  background-image: url('loop-one.svg');
+}

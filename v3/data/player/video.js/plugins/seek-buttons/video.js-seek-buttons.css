@@ -1,0 +1,14 @@
+.vjs-skip-backward,
+.vjs-skip-forward {
+  cursor: pointer;
+}
+.vjs-skip-backward .vjs-icon-placeholder::before {
+  content: '';
+  background: url('backward.svg') center center no-repeat;
+  background-size: 40%;
+}
+.vjs-skip-forward .vjs-icon-placeholder::before {
+  content: '';
+  background: url('forward.svg') center center no-repeat;
+  background-size: 40%;
+}

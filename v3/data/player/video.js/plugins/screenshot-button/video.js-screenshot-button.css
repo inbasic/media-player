@@ -1,0 +1,6 @@
+.vjs-screenshot-button .vjs-icon-placeholder::before {
+  content: '';
+  background: url('screenshot.svg') top -4px center no-repeat;
+  background-size: 90%;
+  cursor: pointer;
+}
