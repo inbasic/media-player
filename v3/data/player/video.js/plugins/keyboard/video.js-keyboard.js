@@ -3,6 +3,7 @@
 
 {
   const Plugin = videojs.getPlugin('plugin');
+  navigator.mediaSession.metadata = navigator.mediaSession.metadata || new MediaMetadata({});
 
   class KeyboardPlugin extends Plugin {
     constructor(player, options) {
@@ -10,22 +11,23 @@
 
       player.toggle = () => player[player.paused() ? 'play' : 'pause']();
 
+      player.on('loadeddata', function(e) {
+        const player = e.target.player;
+        const playlist = player.playlist();
+        const index = player.playlist.currentItem();
 
-      player.on('loadedmetadata', function() {
-        try {
-          navigator.mediaSession.metadata = new MediaMetadata({
-            title: document.title
-          });
-          navigator.mediaSession.setActionHandler('nexttrack', api.player.playlist().length ? () => api.next() : null);
-          navigator.mediaSession.setActionHandler('previoustrack', api.player.playlist().length ? () => api.previous() : null);
-          navigator.mediaSession.setActionHandler('seekbackward', () => {
-            player.seekProgress('backward', 0);
-          });
-          navigator.mediaSession.setActionHandler('seekforward', () => {
-            player.seekProgress('forward', 0);
-          });
-        }
-        catch (e) {}
+        const nexttrack = (playlist.length && index !== playlist.length - 1) ? () => api.next() : null;
+        const previoustrack = (playlist.length && index !== 0) ? () => api.previous() : null;
+
+        navigator.mediaSession.metadata.title = document.title;
+        navigator.mediaSession.setActionHandler('nexttrack', nexttrack);
+        navigator.mediaSession.setActionHandler('previoustrack', previoustrack);
+        navigator.mediaSession.setActionHandler('seekbackward', () => {
+          player.seekProgress('backward', 0);
+        });
+        navigator.mediaSession.setActionHandler('seekforward', () => {
+          player.seekProgress('forward', 0);
+        });
       });
 
       document.body.addEventListener('keydown', ({code, shiftKey, ctrlKey, metaKey}) => {
@@ -42,11 +44,21 @@
           break;
         case 'KeyR':
           if (ctrlKey === false && metaKey === false) {
-            player.toggleLoop();
+            try {
+              player.toggleLoop();
+            }
+            catch (e) {
+              api.toast('Loop Plugin Failed');
+            }
           }
           break;
         case 'KeyB':
-          player.toggleBoost();
+          try {
+            player.toggleBoost();
+          }
+          catch (e) {
+            api.toast('Boost Plugin Failed');
+          }
           break;
         case 'KeyN':
           api.next();

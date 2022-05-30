@@ -18,38 +18,35 @@ document.head.appendChild = new Proxy(document.head.appendChild, {
 });
 
 {
-  const Plugin = videojs.getPlugin('plugin');
   const Button = videojs.getComponent('Button');
+  class CastButton extends Button {
+    handleClick() {
+      this.cjs.cast(this.player_.src());
+    }
+    buildCSSClass() {
+      return 'vjs-control vjs-button vjs-cast-button';
+    }
+    controlText(str, e) {
+      e.title = str || 'Cast Video';
+    }
+  }
+  Button.registerComponent('castButton', CastButton);
 
+  const Plugin = videojs.getPlugin('plugin');
   class CastButtonPlugin extends Plugin {
     constructor(player, options) {
       super(player, options);
 
-      player.on('ready', () => {
-        if (player.controlBar.castButton) {
-          return;
-        }
-
-        // Subclass the component (see 'extend' doc for more info)
-        const CastButton = videojs.extend(Button, {
-          handleClick: () => {
-            cjs.cast(player.src());
-          },
-          buildCSSClass: () => 'vjs-control vjs-button vjs-cast-button'
-        });
-        // Register the new component
-        Button.registerComponent('castButton', CastButton);
-        // forward
+      player.ready(() => {
         const castButton = player.controlBar.castButton = player.controlBar.addChild('castButton');
-        castButton.el().title = 'Cast Video';
         player.controlBar.el().insertBefore(
           castButton.el(),
-          player.controlBar.chaptersButton.el()
+          player.controlBar.fullscreenToggle.el()
         );
         castButton.hide();
 
-        const cjs = new Castjs({});
-        cjs.on('available', () => {
+        castButton.cjs = new Castjs({});
+        castButton.cjs.on('available', () => {
           castButton.show();
         });
       });

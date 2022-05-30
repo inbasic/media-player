@@ -2,9 +2,23 @@
 'use strict';
 
 {
-  const Plugin = videojs.getPlugin('plugin');
   const Button = videojs.getComponent('Button');
+  class BoostButton extends Button {
+    handleClick(e) {
+      console.log(e, this);
+      this.player_.toggleBoost();
+    }
+    buildCSSClass() {
+      return 'vjs-control vjs-button vjs-boost-button';
+    }
+    controlText(str, e) {
+      e.title = str || 'Boost Volume (B)';
+    }
+  }
+  // Register the new component
+  Button.registerComponent('boostButton', BoostButton);
 
+  const Plugin = videojs.getPlugin('plugin');
   class BoostButtonPlugin extends Plugin {
     constructor(player, options) {
       super(player, options);
@@ -25,32 +39,28 @@
         gain.gain.value = value;
       };
 
-      player.on('ready', () => {
-        if (player.controlBar.boostButton) {
-          return;
-        }
-        player.toggleBoost = function() {
-          if (boostButton.hasClass('active')) {
-            boostButton.removeClass('active');
-            player.boost(1);
-          }
-          else {
-            boostButton.addClass('active');
-            player.boost(2);
-          }
-        };
+      player.toggleBoost = function() {
+        const boostButton = player.controlBar.boostButton;
 
-        const BoostButton = videojs.extend(Button, {
-          handleClick: () => {
-            player.toggleBoost();
-          },
-          buildCSSClass: () => 'vjs-control vjs-button vjs-boost-button'
-        });
-        // Register the new component
-        Button.registerComponent('boostButton', BoostButton);
-        // forward
+        if (boostButton.hasClass('active')) {
+          boostButton.removeClass('active');
+          player.boost(1);
+        }
+        else {
+          boostButton.addClass('active');
+          player.boost(2);
+        }
+      };
+
+      player.on('volumechange', () => {
+        const boostButton = player.controlBar.boostButton;
+        if (boostButton) {
+          boostButton[player.volume() >= 0.8 ? 'show' : 'hide']();
+        }
+      });
+
+      player.ready(() => {
         const boostButton = player.controlBar.boostButton = player.controlBar.addChild('boostButton');
-        boostButton.el().title = 'Boost Volume (B)';
         player.controlBar.el().insertBefore(
           boostButton.el(),
           player.controlBar.chaptersButton.el()
@@ -58,9 +68,6 @@
         if (player.volume() < 0.8) {
           boostButton.hide();
         }
-        player.on('volumechange', () => {
-          boostButton[player.volume() >= 0.8 ? 'show' : 'hide']();
-        });
       });
     }
   }

@@ -1,10 +1,22 @@
-/* globals videojs */
+/* globals videojs, api */
 'use strict';
 
 {
-  const Plugin = videojs.getPlugin('plugin');
   const Button = videojs.getComponent('Button');
+  class SeekButton extends Button {
+    handleClick() {
+      this.player_.seekProgress(this.options_.direction);
+    }
+    buildCSSClass() {
+      return 'vjs-control vjs-button vjs-seek-button vjs-skip-' + this.options_.direction;
+    }
+    controlText(str, e) {
+      e.title = str || this.options_.text;
+    }
+  }
+  Button.registerComponent('seekButton', SeekButton);
 
+  const Plugin = videojs.getPlugin('plugin');
   class SeekButtonsPlugin extends Plugin {
     constructor(player, options) {
       super(player, options);
@@ -17,41 +29,28 @@
           time = Math.max(0, time);
           player.currentTime(time);
         }
+        else {
+          api.toast('Cannot seek ' + direction);
+        }
       };
 
-      player.on('ready', () => {
-        if (player.controlBar.forward) {
-          return;
-        }
-
-        // Subclass the component (see 'extend' doc for more info)
-        const SeekButton = videojs.extend(Button, {
-          handleClick: function() {
-            player.seekProgress(this.options_.direction);
-          },
-          buildCSSClass: function() {
-            return 'vjs-control vjs-button vjs-seek-button vjs-skip-' + this.options_.direction;
-          }
-        });
-        // Register the new component
-        Button.registerComponent('seekButton', SeekButton);
-        // forward
+      player.ready(() => {
         const forward = player.controlBar.forward = player.controlBar.addChild('seekButton', {
-          direction: 'forward'
+          direction: 'forward',
+          text: 'Step Forward (→)'
         });
-        forward.el().title = 'Step Forward (→)';
         player.controlBar.el().insertBefore(
           forward.el(),
-          player.controlBar.el().firstChild.nextSibling
+          player.controlBar.playToggle.el().nextSibling
         );
         // backward
         const backward = player.controlBar.backward = player.controlBar.addChild('seekButton', {
-          direction: 'backward'
+          direction: 'backward',
+          text: 'Step Backward (←)'
         });
-        backward.el().title = 'Step Backward (←)';
         player.controlBar.el().insertBefore(
           backward.el(),
-          player.controlBar.el().firstChild.nextSibling
+          player.controlBar.playToggle.el()
         );
       });
     }

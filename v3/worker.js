@@ -212,9 +212,21 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     title: 'Options',
     contexts: ['action']
   });
+  chrome.contextMenus.create({
+    id: 'plugins',
+    title: 'Player Plugins',
+    contexts: ['action']
+  });
   chrome.storage.local.get({
     'open-in-tab': false,
-    'capture-media': true
+    'capture-media': true,
+    'screenshot-plugin': true,
+    'cast-plugin': true,
+    'boost-plugin': true,
+    'loop-plugin': true,
+    'shuffle-plugin': true,
+    'stop-plugin': true,
+    'wave-plugin': true
   }, prefs => {
     chrome.contextMenus.create({
       id: 'open-in-tab',
@@ -232,10 +244,71 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
       checked: prefs['capture-media'],
       parentId: 'options'
     });
+    chrome.contextMenus.create({
+      id: 'screenshot-plugin',
+      title: 'Screenshot Button Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['screenshot-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
+      id: 'cast-plugin',
+      title: 'Cast Button Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['cast-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
+      id: 'boost-plugin',
+      title: 'Boost Button Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['boost-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
+      id: 'loop-plugin',
+      title: 'Loop Button Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['loop-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
+      id: 'shuffle-plugin',
+      title: 'Shuffle Button Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['shuffle-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
+      id: 'stop-plugin',
+      title: 'Stop Button Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['stop-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
+      id: 'wave-plugin',
+      title: 'Wave Surfer Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['wave-plugin'],
+      parentId: 'plugins'
+    });
   });
 });
 chrome.contextMenus.onClicked.addListener(info => {
   if (info.menuItemId === 'open-in-tab' || info.menuItemId === 'capture-media') {
+    chrome.storage.local.set({
+      [info.menuItemId]: info.checked
+    });
+  }
+  else if (info.menuItemId.endsWith('-plugin')) {
     chrome.storage.local.set({
       [info.menuItemId]: info.checked
     });

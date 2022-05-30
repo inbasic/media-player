@@ -1,4 +1,4 @@
-/* globals videojs, WaveSurfer */
+/* global videojs, WaveSurfer */
 'use strict';
 
 {
@@ -26,7 +26,7 @@
         }
         player.currentTime(player.duration() * e.clientX / width);
       });
-      player.on('ready', () => {
+      player.ready(() => {
         player.el().insertBefore(div, player.controlBar.el());
       });
 
@@ -38,11 +38,9 @@
         div.textContent = '';
         const index = player.playlist.currentItem();
         if (index > -1) {
-          const src = player.playlist()[index].sources[0];
-          // console.log(src);
-          // only load for audio
-          const video = player.el().querySelector('video');
-          if (src.type && src.type.startsWith('audio/') || (video.videoWidth === 0 && video.videoHeight === 0)) {
+          const type = player.currentType();
+
+          if (type && type.startsWith('audio/') || (player.videoWidth() === 0 && player.videoHeight() === 0)) {
             wavesurfer = WaveSurfer.create({
               container: div,
               waveColor: options.waveColor,
@@ -53,7 +51,7 @@
               wavesurfer.seekTo(player.currentTime() / player.duration());
               div.style.visibility = 'visible';
             });
-            wavesurfer.load(src.src);
+            wavesurfer.load(player.currentSrc());
           }
           else {
             wavesurfer.destroy();
@@ -64,14 +62,19 @@
       player.on('timeupdate', () => {
         wavesurfer.seekTo(player.currentTime() / player.duration());
       });
+
+      let id;
       window.addEventListener('resize', () => {
-        try {
-          wavesurfer.empty();
-          wavesurfer.drawBuffer();
-          wavesurfer.seekTo(player.currentTime() / player.duration());
-          width = div.getBoundingClientRect().width;
-        }
-        catch (e) {}
+        clearTimeout(id);
+        id = setTimeout(() => {
+          try {
+            wavesurfer.empty();
+            wavesurfer.drawBuffer();
+            wavesurfer.seekTo(player.currentTime() / player.duration());
+            width = div.getBoundingClientRect().width;
+          }
+          catch (e) {}
+        }, 100);
       });
     }
   }

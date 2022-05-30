@@ -46,22 +46,11 @@ api.player = videojs('video-player', {
     mousePlugin: {},
     captionPlugin: {},
     seekButtonsPlugin: api.config.seek,
-    stopButtonPlugin: {},
-    screenshotButtonPlugin: {},
-    boostButtonPlugin: {},
-    loopButtonPlugin: {},
-    shuffleButtonPlugin: {},
     historyPlugin: {},
-    waveSurferPlugin: {
-      waveColor: 'rgba(115,133,159,.75)',
-      progressColor: 'rgba(0, 0, 0, 0.5)',
-      height: 300
-    },
     smartInactivePlugin: {
       inactivityTimeout: api.config.inactivityTimeout * 1000
     },
-    playBackRatePlugin: {},
-    castButtonPlugin: {}
+    playBackRatePlugin: {}
   }
 }, () => {
   document.title = api.config.name;
@@ -73,6 +62,43 @@ api.player = videojs('video-player', {
   api.player.playlistUi({
     el: document.getElementById('playlist')
   });
+});
+
+// async plugins
+chrome.storage.local.get({
+  'screenshot-plugin': true,
+  'cast-plugin': true,
+  'boost-plugin': true,
+  'loop-plugin': true,
+  'shuffle-plugin': true,
+  'stop-plugin': true,
+  'wave-plugin': true
+}, prefs => {
+  if (prefs['cast-plugin']) {
+    api.player.castButtonPlugin();
+  }
+  if (prefs['screenshot-plugin']) {
+    api.player.screenshotButtonPlugin();
+  }
+  if (prefs['boost-plugin']) {
+    api.player.boostButtonPlugin();
+  }
+  if (prefs['loop-plugin']) {
+    api.player.loopButtonPlugin();
+  }
+  if (prefs['shuffle-plugin']) {
+    api.player.shuffleButtonPlugin();
+  }
+  if (prefs['stop-plugin']) {
+    api.player.stopButtonPlugin();
+  }
+  if (prefs['wave-plugin']) {
+    api.player.waveSurferPlugin({
+      waveColor: 'rgba(115,133,159,.75)',
+      progressColor: 'rgba(0, 0, 0, 0.5)',
+      height: 300
+    });
+  }
 });
 
 api.player.on('error', e => {
@@ -106,12 +132,22 @@ api.player.bigPlayButton.on('click', e => {
 // api.local
 // api.remote
 api.next = () => {
-  if (!api.player.playlist.next()) {
+  if (api.player.playlist.next()) {
+    if (api.player.paused()) {
+      api.player.play();
+    }
+  }
+  else {
     api.toast('No more tracks');
   }
 };
 api.previous = () => {
-  if (!api.player.playlist.previous()) {
+  if (api.player.playlist.previous()) {
+    if (api.player.paused()) {
+      api.player.play();
+    }
+  }
+  else {
     api.toast('No previous track');
   }
 };

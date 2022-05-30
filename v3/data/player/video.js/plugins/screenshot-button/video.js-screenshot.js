@@ -2,9 +2,21 @@
 'use strict';
 
 {
-  const Plugin = videojs.getPlugin('plugin');
   const Button = videojs.getComponent('Button');
+  class ScreenshotButton extends Button {
+    handleClick() {
+      this.player_.snap();
+    }
+    buildCSSClass() {
+      return 'vjs-control vjs-button vjs-screenshot-button';
+    }
+    controlText(str, e) {
+      e.title = str || 'Take a screenshot (S)';
+    }
+  }
+  Button.registerComponent('screenshotButton', ScreenshotButton);
 
+  const Plugin = videojs.getPlugin('plugin');
   class ScreenshotButtonPlugin extends Plugin {
     constructor(player, options) {
       super(player, options);
@@ -31,23 +43,8 @@
         player.el().focus();
       };
 
-      player.on('ready', () => {
-        if (player.controlBar.screenshotButton) {
-          return;
-        }
-
-        // Subclass the component (see 'extend' doc for more info)
-        const ScreenshotButton = videojs.extend(Button, {
-          handleClick: () => {
-            player.snap();
-          },
-          buildCSSClass: () => 'vjs-control vjs-button vjs-screenshot-button'
-        });
-        // Register the new component
-        Button.registerComponent('screenshotButton', ScreenshotButton);
-        // forward
+      player.ready(() => {
         const screenshotButton = player.controlBar.screenshotButton = player.controlBar.addChild('screenshotButton');
-        screenshotButton.el().title = 'Take a screenshot (S)';
         player.controlBar.el().insertBefore(
           screenshotButton.el(),
           player.controlBar.chaptersButton.el()
@@ -57,9 +54,9 @@
         player.on('loadedmetadata', () => {
           const index = player.playlist.currentItem();
           if (index > -1) {
-            const video = player.el().querySelector('video');
-            const src = player.playlist()[index].sources[0];
-            const audio = src.type && src.type.startsWith('audio/') || (video.videoWidth === 0 && video.videoHeight === 0);
+            const type = player.currentType();
+
+            const audio = (type && type.startsWith('audio/')) || (player.videoWidth() === 0 && player.videoHeight() === 0);
             if (audio) {
               screenshotButton.hide();
             }
