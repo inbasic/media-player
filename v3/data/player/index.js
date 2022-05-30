@@ -2,19 +2,16 @@
 'use strict';
 
 // resize
-window.addEventListener('beforeunload', () => {
-  if (api.arguments.mode === 'window') {
-    chrome.runtime.sendMessage({
-      method: 'save-size',
-      size: {
-        left: window.screenX,
-        top: window.screenY,
-        width: Math.max(window.outerWidth, 100),
-        height: Math.max(window.outerHeight, 100)
-      }
-    });
+window.addEventListener('beforeunload', () => chrome.runtime.sendMessage({
+  method: 'player-closed',
+  type: api.arguments.mode,
+  size: {
+    left: window.screenX,
+    top: window.screenY,
+    width: Math.max(window.outerWidth, 100),
+    height: Math.max(window.outerHeight, 100)
   }
-});
+}));
 
 // message passing
 if (chrome.runtime && chrome.runtime.onMessage) {

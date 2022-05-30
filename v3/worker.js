@@ -66,8 +66,39 @@ const onCommand = (options = {}) => {
         }
       });
     });
+  }).then(tab => {
+    // unblock CORS if possible
+    if (chrome.declarativeNetRequest) {
+      const tabId = tab.id;
+      chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [tabId],
+        addRules: [{
+          'id': tabId,
+          'priority': 1,
+          'action': {
+            'type': 'modifyHeaders',
+            'responseHeaders': [{
+              'operation': 'set',
+              'header': 'access-control-allow-origin',
+              'value': '*'
+            }]
+          },
+          'condition': {
+            'resourceTypes': ['xmlhttprequest', 'media'],
+            'tabIds': [tabId]
+          }
+        }]
+      });
+    }
+
+    return tab;
   }));
 };
+
+const capture = () => chrome.permissions.request({
+  permissions: ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'],
+  origins: ['*://*/*']
+});
 
 chrome.action.onClicked.addListener(tab => {
   const next = () => {
@@ -131,10 +162,7 @@ This way the extension plays the media on its interface when the button is press
       chrome.storage.local.set({
         'request-active-tab-2': false
       });
-      chrome.permissions.request({
-        permissions: ['activeTab', 'scripting'],
-        origins: ['*://*/*']
-      }, next);
+      capture().finally(next);
     }
     else {
       next();
@@ -151,8 +179,15 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
       highlighted: true
     });
   }
-  else if (request.method === 'save-size') {
-    chrome.storage.local.set(request.size);
+  else if (request.method === 'player-closed') {
+    if (request.mode === 'window') {
+      chrome.storage.local.set(request.size);
+    }
+    if (chrome.declarativeNetRequest) {
+      chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [sender.tab.id]
+      });
+    }
   }
   else if (request.method === 'srcs') {
     response(onCommand.srcs || []);
@@ -303,7 +338,15 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
   });
 });
 chrome.contextMenus.onClicked.addListener(info => {
-  if (info.menuItemId === 'open-in-tab' || info.menuItemId === 'capture-media') {
+  if (info.menuItemId === 'capture-media') {
+    chrome.storage.local.set({
+      [info.menuItemId]: info.checked
+    });
+    if (info.checked) {
+      capture();
+    }
+  }
+  else if (info.menuItemId === 'open-in-tab') {
     chrome.storage.local.set({
       [info.menuItemId]: info.checked
     });
@@ -321,14 +364,14 @@ chrome.contextMenus.onClicked.addListener(info => {
   else if (info.menuItemId === 'open-src') {
     chrome.permissions.request({
       origins: [info.srcUrl]
-    }, granted => granted && onCommand({
+    }).finally(() => onCommand({
       src: info.srcUrl
     }));
   }
   else if (info.menuItemId === 'play-link') {
     chrome.permissions.request({
       origins: [info.linkUrl]
-    }, granted => granted && onCommand({
+    }).finally(() => onCommand({
       src: info.linkUrl
     }));
   }
