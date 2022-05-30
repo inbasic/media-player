@@ -60,6 +60,14 @@
             api.toast('Boost Plugin Failed');
           }
           break;
+        case 'KeyC':
+          try {
+            api.player.controlBar.castButton.trigger('click');
+          }
+          catch (e) {
+            api.toast('Cast Plugin Failed');
+          }
+          break;
         case 'KeyN':
           api.next();
           break;

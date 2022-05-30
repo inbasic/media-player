@@ -21,13 +21,17 @@ document.head.appendChild = new Proxy(document.head.appendChild, {
   const Button = videojs.getComponent('Button');
   class CastButton extends Button {
     handleClick() {
-      this.cjs.cast(this.player_.src());
+      const player = this.player_;
+
+      this.cjs.cast(player.currentSrc(), {
+        type: player.currentType()
+      });
     }
     buildCSSClass() {
       return 'vjs-control vjs-button vjs-cast-button';
     }
     controlText(str, e) {
-      e.title = str || 'Cast Video';
+      e.title = str || 'Cast Video (C)';
     }
   }
   Button.registerComponent('castButton', CastButton);

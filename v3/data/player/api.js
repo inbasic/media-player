@@ -113,7 +113,8 @@ api.player.on('error', e => {
   api.toast(api.player.currentSrc(), {timeout: 5});
 });
 
-api.player.bigPlayButton.el_.title = 'Click: Open local resources\nShift + Click: Open remote resources';
+api.player.bigPlayButton.el_.title = `Click: Open local resources
+Shift + Click: Open remote resources`;
 api.player.bigPlayButton.on('click', e => {
   if (e.shiftKey) {
     api.remote.prompt();
@@ -197,6 +198,10 @@ api.local = files => {
       }]
     };
   });
+  if (playlist.length === 0) {
+    api.toast('No media is detected');
+  }
+
   api.append(playlist);
 };
 api.remote = urls => chrome.runtime.sendMessage({
