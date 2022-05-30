@@ -71,47 +71,52 @@ const onCommand = (options = {}) => {
 
 chrome.action.onClicked.addListener(tab => {
   const next = () => {
-    Promise.race([
-      chrome.scripting.executeScript({
-        target: {
-          tabId: tab.id,
-          allFrames: true
-        },
-        func: formats => {
-          const links = [];
-          [...document.querySelectorAll('video, audio, source')].map(e => {
-            if (e.src && e.src.startsWith('http')) {
-              try {
-                e.pause();
+    if (chrome.scripting) {
+      Promise.race([
+        chrome.scripting.executeScript({
+          target: {
+            tabId: tab.id,
+            allFrames: true
+          },
+          func: formats => {
+            const links = [];
+            [...document.querySelectorAll('video, audio, source')].map(e => {
+              if (e.src && e.src.startsWith('http')) {
+                try {
+                  e.pause();
+                }
+                catch (e) {}
+                links.push(e.src);
               }
-              catch (e) {}
-              links.push(e.src);
+            });
+            for (const a of [...document.querySelectorAll('a')]) {
+              if (a.href && formats.some(s => a.href.includes('.' + s))) {
+                links.push(a.href);
+              }
             }
+
+            return links;
+          },
+          args: [FORMATS]
+        }),
+        new Promise(resolve => setTimeout(resolve, 1000, []))
+      ]).then(results => {
+        results = results.map(a => a.result).flat().filter(a => a);
+
+        if (results.length) {
+          onCommand({
+            src: results[0],
+            srcs: results
           });
-          for (const a of [...document.querySelectorAll('a')]) {
-            if (a.href && formats.some(s => a.href.includes('.' + s))) {
-              links.push(a.href);
-            }
-          }
-
-          return links;
-        },
-        args: [FORMATS]
-      }),
-      new Promise(resolve => setTimeout(resolve, 1000, []))
-    ]).then(results => {
-      results = results.map(a => a.result).flat().filter(a => a);
-
-      if (results.length) {
-        onCommand({
-          src: results[0],
-          srcs: results
-        });
-      }
-      else {
-        onCommand();
-      }
-    }).catch(() => onCommand());
+        }
+        else {
+          onCommand();
+        }
+      }).catch(() => onCommand());
+    }
+    else {
+      onCommand();
+    }
   };
   chrome.storage.local.get({
     'request-active-tab-2': true,
@@ -131,11 +136,8 @@ This way the extension plays the media on its interface when the button is press
         origins: ['*://*/*']
       }, next);
     }
-    else if (chrome.scripting) {
-      next();
-    }
     else {
-      onCommand();
+      next();
     }
   });
 });

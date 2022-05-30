@@ -3,20 +3,14 @@
 document.head.appendChild = new Proxy(document.head.appendChild, {
   apply(target, self, args) {
     const [script] = args;
-    if (script.src === 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1') {
-      script.src = 'video.js/plugins/cast/cast_sender.js?loadCastFramework=1';
-    }
-    if (script.src && script.src.endsWith('www.gstatic.com/eureka/clank/cast_sender.js')) {
-      script.src = 'video.js/plugins/cast/eureka/clank/cast_sender.js';
-    }
-    if (script.src && script.src.endsWith('www.gstatic.com/eureka/clank/101/cast_sender.js')) {
-      script.src = 'video.js/plugins/cast/eureka/clank/101/cast_sender.js';
-    }
-    if (script.src && script.src.endsWith('www.gstatic.com/eureka/clank/102/cast_sender.js')) {
-      script.src = 'video.js/plugins/cast/eureka/clank/102/cast_sender.js';
-    }
-    if (script.src && script.src.endsWith('www.gstatic.com/cast/sdk/libs/sender/1.0/cast_framework.js')) {
-      script.src = 'video.js/plugins/cast/sdk/libs/sender/1.0/cast_framework.js';
+
+    if (script.src && script.src.includes('www.gstatic.com')) {
+      if (script.src.includes('/clank/')) {
+        script.src = 'video.js/plugins/cast/eureka/clank/102/cast_sender.js';
+      }
+      else {
+        script.src = 'video.js/plugins/cast' + script.src.split('www.gstatic.com')[1];
+      }
     }
 
     return Reflect.apply(target, self, args);
