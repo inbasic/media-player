@@ -31,7 +31,6 @@
       });
 
       document.body.addEventListener('keydown', ({code, shiftKey, ctrlKey, metaKey}) => {
-        // console.log(code)
         switch (code) {
         case 'KeyO':
           api.remote.prompt();
@@ -107,12 +106,12 @@ P Key: Previous track
 → Key: Seek +10 seconds
 ↑ Key: Volume up
 ↓ Key: Volume down`, {
-            timeout: 10,
+            timeout: 1200,
             style: `
-              bottom: 80px;
-              right: 30px;
+              bottom: 10px;
+              right: 10px;
               top: auto;
-              font-size: 100%;
+              font-size: 12px;
               margin: auto;
             `
           });

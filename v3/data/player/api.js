@@ -72,7 +72,9 @@ chrome.storage.local.get({
   'loop-plugin': true,
   'shuffle-plugin': true,
   'stop-plugin': true,
-  'wave-plugin': true
+  'wave-plugin': true,
+  'permission-plugin': true,
+  'pip-plugin': true
 }, prefs => {
   if (prefs['cast-plugin']) {
     api.player.castButtonPlugin();
@@ -92,12 +94,18 @@ chrome.storage.local.get({
   if (prefs['stop-plugin']) {
     api.player.stopButtonPlugin();
   }
+  if (prefs['permission-plugin']) {
+    api.player.permissionButtonPlugin();
+  }
   if (prefs['wave-plugin']) {
     api.player.waveSurferPlugin({
       waveColor: 'rgba(115,133,159,.75)',
       progressColor: 'rgba(0, 0, 0, 0.5)',
       height: 300
     });
+  }
+  if (prefs['pip-plugin'] === false) {
+    api.player.controlBar.pictureInPictureToggle.dispose();
   }
 });
 

@@ -5,7 +5,6 @@
   const Button = videojs.getComponent('Button');
   class BoostButton extends Button {
     handleClick(e) {
-      console.log(e, this);
       this.player_.toggleBoost();
     }
     buildCSSClass() {

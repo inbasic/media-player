@@ -35,6 +35,7 @@ button {
   border-radius: 4px;
   padding: 5px 20px;
   white-space: pre;
+  font-size: 13px;
 }
 #toast:empty {
   display: none;
@@ -58,16 +59,19 @@ button {
   align-items: center;
 }
 
-/* .video-js .vjs-big-play-button {
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%);
+.video-js .vjs-big-play-button {
+  width: 6em !important;
+  height: 2em !important;
 }
- */
+.video-js .vjs-big-play-button .vjs-icon-placeholder::before {
+  content: 'Drag Media or Click to Start' !important;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: unset !important;
+}
 
-.video-js .vjs-picture-in-picture-control {
-  display: none !important;
-}
 .vjs-playback-rate .vjs-playback-rate-value {
   font-size: 100% !important;
   line-height: 3 !important;

@@ -95,11 +95,6 @@ const onCommand = (options = {}) => {
   }));
 };
 
-const capture = () => chrome.permissions.request({
-  permissions: ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'],
-  origins: ['*://*/*']
-});
-
 chrome.action.onClicked.addListener(tab => {
   const next = () => {
     if (chrome.scripting) {
@@ -150,19 +145,10 @@ chrome.action.onClicked.addListener(tab => {
     }
   };
   chrome.storage.local.get({
-    'request-active-tab-2': true,
-    'capture-media': true
+    'capture-media': false
   }, prefs => {
     if (prefs['capture-media'] === false) {
       onCommand();
-    }
-    else if (prefs['request-active-tab-2']) {
-      notify(`The extension can optionally find video links from the active tab when this button is pressed.
-This way the extension plays the media on its interface when the button is pressed.`);
-      chrome.storage.local.set({
-        'request-active-tab-2': false
-      });
-      capture().finally(next);
     }
     else {
       next();
@@ -254,14 +240,16 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
   });
   chrome.storage.local.get({
     'open-in-tab': false,
-    'capture-media': true,
+    'capture-media': false,
     'screenshot-plugin': true,
     'cast-plugin': true,
     'boost-plugin': true,
     'loop-plugin': true,
     'shuffle-plugin': true,
     'stop-plugin': true,
-    'wave-plugin': true
+    'permission-plugin': true,
+    'wave-plugin': true,
+    'pip-plugin': true
   }, prefs => {
     chrome.contextMenus.create({
       id: 'open-in-tab',
@@ -328,6 +316,14 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
       parentId: 'plugins'
     });
     chrome.contextMenus.create({
+      id: 'permission-plugin',
+      title: 'Capture Media Button Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['permission-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
       id: 'wave-plugin',
       title: 'Wave Surfer Plugin',
       contexts: ['action'],
@@ -335,15 +331,35 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
       checked: prefs['wave-plugin'],
       parentId: 'plugins'
     });
+    chrome.contextMenus.create({
+      id: 'pip-plugin',
+      title: 'Picture in Picture Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['pip-plugin'],
+      parentId: 'plugins'
+    });
   });
 });
 chrome.contextMenus.onClicked.addListener(info => {
   if (info.menuItemId === 'capture-media') {
-    chrome.storage.local.set({
-      [info.menuItemId]: info.checked
-    });
     if (info.checked) {
-      capture();
+      chrome.permissions.request({
+        permissions: ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'],
+        origins: ['*://*/*']
+      }).catch(() => false).then(granted => {
+        chrome.storage.local.set({
+          'capture-media': granted
+        });
+        chrome.contextMenus.update('capture-media', {
+          checked: granted
+        });
+      });
+    }
+    else {
+      chrome.storage.local.set({
+        'capture-media': info.checked
+      });
     }
   }
   else if (info.menuItemId === 'open-in-tab') {
