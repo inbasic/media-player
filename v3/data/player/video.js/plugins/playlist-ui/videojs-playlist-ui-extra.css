@@ -1,0 +1,18 @@
+.vjs-playlist {
+  position: absolute;
+  font-size: 12px !important;
+  overflow: auto;
+  max-height: calc(100vh - 80px);
+  bottom: 40px;
+  right: 6px;
+  width: 400px;
+}
+.vjs-playlist .vjs-playlist-thumbnail-placeholder {
+  height: 60px !important;
+}
+.vjs-playlist .vjs-playlist-name {
+  padding: 0 0 2px 2px;
+}
+.vjs-playlist li {
+  outline: none;
+}

@@ -1,0 +1,55 @@
+  .vjs-fluid {
+    overflow: hidden;
+  }
+  .vjs-control-bar {
+    display: block;
+  }
+  .vjs-control {
+    position: absolute;
+  }
+  .vjs-progress-control {
+    bottom: 28px; left: 0;
+    height: 10px;
+    width:  100%;
+  }
+  .vjs-progress-holder  {
+    position: absolute;
+    left: 0; margin: 0;
+    height: 8px; width:  100%;
+  }
+  .vjs-play-progress,
+  .vjs-load-progress {
+    height: 8px;
+  }
+  .vjs-play-progress:before {
+    font-size: 12px; top: -2px;
+    text-shadow: 0 0 2px black
+  }
+  .vjs-current-time {
+    display: block;
+    left: 35px;
+  }
+  .vjs-time-divider {
+    position: absolute;
+    display: block;
+    left: 70px;
+  }
+  .vjs-remaining-time {
+    display: none;
+  }
+  .vjs-duration {
+    display: block;
+    left: 70px;
+  }
+  .vjs-volume-menu-button {
+    position: absolute;
+    bottom: 0; right: 55px;
+  }
+  .vjs-playback-rate {
+    position: absolute;
+    bottom: 0; right: 28px;
+  }
+  .vjs-fullscreen-control {
+    position: absolute;
+    bottom: 0; right: 0;
+  }

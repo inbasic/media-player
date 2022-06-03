@@ -1,0 +1,9 @@
+.vjs-cast-button {
+  position: relative;
+}
+.vjs-cast-button .vjs-icon-placeholder::before {
+  content: '';
+  background: url('cast.svg') center center no-repeat;
+  background-size: 40%;
+  cursor: pointer;
+}

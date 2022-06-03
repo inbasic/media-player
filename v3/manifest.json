@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "version": "0.4.1",
+  "name": "MediaPlayer - Video and Audio Player",
+  "description": "__MSG_description__",
+  "default_locale": "en",
+  "background": {
+    "service_worker": "worker.js"
+  },
+  "offline_enabled": true,
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "notifications"
+  ],
+  "optional_permissions": [
+    "activeTab",
+    "scripting",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
+  ],
+  "action": {},
+  "icons": {
+    "16": "data/icons/16.png",
+    "32": "data/icons/32.png",
+    "48": "data/icons/48.png",
+    "64": "data/icons/64.png",
+    "128": "data/icons/128.png",
+    "256": "data/icons/256.png",
+    "512": "data/icons/512.png"
+  },
+  "commands": {
+    "_execute_action": {},
+    "previous-track": {
+      "description": "Previous Track"
+    },
+    "next-track": {
+      "description": "Next Track"
+    },
+    "toggle-play": {
+      "description": "Toggle Play/Pause"
+    }
+  },
+  "homepage_url": "https://add0n.com/the-media-player.html"
+}

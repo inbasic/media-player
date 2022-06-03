@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="video.js/video-js.css">
+    <link rel="stylesheet" href="video.js/plugins/seek-buttons/video.js-seek-buttons.css">
+    <link rel="stylesheet" href="video.js/plugins/stop-button/video.js-stop-button.css">
+    <link rel="stylesheet" href="video.js/plugins/screenshot-button/video.js-screenshot-button.css">
+    <link rel="stylesheet" href="video.js/plugins/boost-button/video.js-boost-button.css">
+    <link rel="stylesheet" href="video.js/plugins/loop-button/video.js-loop-button.css">
+    <link rel="stylesheet" href="video.js/plugins/shuffle-button/video.js-shuffle-button.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/fix-control-bar/video.js-fixed-control-bar.css">
+    <link rel="stylesheet" href="video.js/plugins/poster/video.js-poster.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-ui/videojs-playlist-ui.vertical.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-ui/videojs-playlist-ui-extra.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/playlist-button/video.js-playlist-button.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/wavesurfer/video.js-wavesurfer.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/cast/video.js-cast.css">
+    <link rel="stylesheet" type="text/css" href="video.js/plugins/permission/video.js-permission.css">
+    <!--
+      <link rel="stylesheet" href="video.js/plugins/fullwidth-progressbar/video.js-fullwith-progressbar.css">
+    -->
+    <title>Loading - Media Player</title>
+  </head>
+  <body hbox>
+    <div id="sidebar">side</div>
+    <div id="content" flex="1">
+      <div id=player>
+        <div id="wave-surfer"></div>
+        <div id="toast"></div>
+        <video
+            id="video-player"
+            class="video-js"
+            controls
+            preload="auto"
+            poster="poster/1920x1200.jpg">
+        </video>
+      </div>
+      <div id="playlist" class="vjs-playlist vjs-hidden"></div>
+    </div>
+    <script src="video.js/video.js"></script>
+    <script src="video.js/plugins/volume/video.js-volume.js"></script>
+    <script src="video.js/plugins/wavesurfer/wavesurfer.js"></script>
+    <script src="video.js/plugins/mouse/video.js-mouse.js"></script>
+    <script src="video.js/plugins/seek-buttons/video.js-seek-buttons.js"></script>
+    <script src="video.js/plugins/stop-button/video.js-stop-button.js"></script>
+    <script src="video.js/plugins/screenshot-button/video.js-screenshot.js"></script>
+    <script src="video.js/plugins/boost-button/video.js-boost.js"></script>
+    <script src="video.js/plugins/loop-button/video.js-loop-button.js"></script>
+    <script src="video.js/plugins/shuffle-button/video.js-shuffle-button.js"></script>
+    <script src="video.js/plugins/caption/video.js.caption.js"></script>
+    <script src="video.js/plugins/history/video.js-history.js"></script>
+    <script src="video.js/plugins/playlist/videojs-playlist.js"></script>
+    <script src="video.js/plugins/playlist-ui/videojs-playlist-ui.js"></script>
+    <script src="video.js/plugins/playlist-ui/videojs-playlist-ui-extra.js"></script>
+    <script src="video.js/plugins/playlist-button/video.js-playlist-button.js"></script>
+    <script src="video.js/plugins/keyboard/video.js-keyboard.js"></script>
+    <script src="video.js/plugins/title/video.js-title.js"></script>
+    <script src="video.js/plugins/wavesurfer/vidoe.js-wavesurfer.js"></script>
+    <script src="video.js/plugins/smart-inactive/video.js-smart-inactive.js"></script>
+    <script src="video.js/plugins/http-streaming/videojs-http-streaming.js"></script>
+    <script src="video.js/plugins/playback-rate/video.js-playback-rate.js"></script>
+    <script src="video.js/plugins/cast/video.js-cast.js"></script>
+    <script src="video.js/plugins/cast/cast.js"></script>
+    <script src="video.js/plugins/permission/video.js-permission.js"></script>
+
+
+    <script src="api.js"></script>
+    <script src="drop.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
