@@ -1,4 +1,4 @@
-/* globals videojs, api */
+/* global videojs */
 'use strict';
 
 {
@@ -15,63 +15,43 @@
         }, prefs => Object.assign(cache, prefs.cache));
       }
 
-      const save = () => {
-        if (api.background) {
-          api.background.save({cache});
-        }
-        else {
-          save.dummy.cache = Object.assign({}, cache);
-        }
-      };
-      save.dummy = {
-        cache: {}
-      };
+      const save = () => chrome.runtime.sendMessage({
+        method: 'save-cache',
+        cache
+      });
+
       const read = (prefs, callback) => {
-        if (chrome.storage) {
-          chrome.storage.local.get(prefs, callback);
-        }
-        else {
-          callback(save.dummy);
-        }
+        chrome.storage.local.get(prefs, callback);
       };
 
       player.on('timeupdate', () => {
-        const index = player.playlist.currentItem();
-        if (index > -1) {
-          const name = player.playlist()[index].name;
-          if (name) {
-            cache[name] = player.currentTime();
-          }
+        const {name} = player.currentSource();
+        if (name) {
+          cache[name] = player.currentTime();
         }
       });
 
       player.on('loadedmetadata', () => {
-        const index = player.playlist.currentItem();
-        if (index > -1) {
-          const name = player.playlist()[index].name;
-          if (name) {
-            read({
-              cache: {}
-            }, prefs => {
-              if (prefs.cache[name]) {
-                player.currentTime(prefs.cache[name]);
-                cache[name] = prefs.cache[name];
-              }
-              save();
-            });
-          }
+        const {name} = player.currentSource();
+        if (name) {
+          read({
+            cache: {}
+          }, prefs => {
+            if (prefs.cache[name]) {
+              player.currentTime(prefs.cache[name]);
+              cache[name] = prefs.cache[name];
+            }
+            save();
+          });
         }
       });
       window.addEventListener('beforeunload', save);
 
       player.on('ended', () => {
-        const index = player.playlist.currentItem();
-        if (index > -1) {
-          const name = player.playlist()[index].name;
-          if (name) {
-            cache[name] = 0;
-            save();
-          }
+        const {name} = player.currentSource();
+        if (name) {
+          cache[name] = 0;
+          save();
         }
       });
     }

@@ -179,6 +179,11 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     response(onCommand.srcs || []);
     onCommand.srcs = [];
   }
+  else if (request.method === 'save-cache') {
+    chrome.storage.local.set({
+      cache: request.cache
+    });
+  }
 });
 
 // context-menu

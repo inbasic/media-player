@@ -39,7 +39,7 @@
 
         player.controlBar.el().insertBefore(
           button.el(),
-          player.controlBar.volumePanel.el()
+          player.controlBar.playbackRateMenuButton.el().nextSibling
         );
       }));
     }

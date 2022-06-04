@@ -194,13 +194,15 @@ api.local = files => {
     // looking for subtitles
     const base = file.name.replace(/\.[^.]*$/, '');
     const caption = files.filter(f => f !== file && f.name.startsWith(base)).shift();
+    const name = file.name;
 
     return {
-      name: file.name.replace(/\.[^.]+$/, ''),
+      name,
       duration: '--',
       type: dtype(file.type),
       caption,
       sources: [{
+        name,
         src: URL.createObjectURL(file),
         type: dtype(file.type)
       }]
@@ -227,12 +229,14 @@ api.remote = urls => chrome.runtime.sendMessage({
       }
     }
     return src;
-  }).map(src => ({
-    sources: [{
-      src,
-      name: src.split('/').pop()
-    }]
-  }));
+  }).map(src => {
+    return {
+      sources: [{
+        src,
+        name: src.split('/').pop()
+      }]
+    };
+  });
 
   await Promise.all(playlist.map(o => {
     const controller = new AbortController();
