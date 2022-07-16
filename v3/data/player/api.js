@@ -1,6 +1,8 @@
 'use strict';
 /* global videojs */
 
+const isFF = /Firefox/.test(navigator.userAgent);
+
 const exts = [
   'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv', 'vob',
   'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc', 'm3u8'
@@ -66,9 +68,9 @@ api.player = videojs('video-player', {
 
 // async plugins
 chrome.storage.local.get({
-  'screenshot-plugin': true,
+  'screenshot-plugin': isFF ? false : true,
   'cast-plugin': false,
-  'boost-plugin': true,
+  'boost-plugin': isFF ? false : true,
   'loop-plugin': true,
   'shuffle-plugin': true,
   'stop-plugin': true,

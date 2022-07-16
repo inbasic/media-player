@@ -1,12 +1,13 @@
 /* global videojs, api */
 
 {
+  const permissions = /Firefox/.test(navigator.userAgent) ? ['activeTab'] : ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'];
   const Button = videojs.getComponent('Button');
   class PermissionButton extends Button {
     handleClick() {
       chrome.permissions.request({
-        permissions: ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'],
-        origins: ['*://*/*']
+        origins: ['*://*/*'],
+        permissions
       }).then(granted => {
         if (granted) {
           chrome.storage.local.set({
@@ -32,7 +33,7 @@
       super(player, options);
 
       chrome.permissions.contains({
-        permissions: ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'],
+        permissions,
         origins: ['*://*/*']
       }).then(granted => granted === false && player.ready(() => {
         const button = player.permissionButton = player.controlBar.addChild('permissionButton');

@@ -26,18 +26,24 @@
         player.el().blur();
         player.controlBar.hide();
 
-        const video = player.el().querySelector('video');
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        try {
+          const video = player.el().querySelector('video');
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
 
-        const context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0);
+          const context = canvas.getContext('2d');
+          context.drawImage(video, 0, 0);
 
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL();
-        a.download = 'screenshot.png';
-        a.click();
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL();
+          a.download = 'screenshot.png';
+          a.click();
+        }
+        catch (e) {
+          console.warn(e);
+          alert(e.message);
+        }
 
         player.controlBar.show();
         player.el().focus();

@@ -1,5 +1,6 @@
 'use strict';
 
+const isFF = /Firefox/.test(navigator.userAgent);
 const FORMATS = [
   'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv', 'vob',
   'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc', 'm3u8'
@@ -246,9 +247,9 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
   chrome.storage.local.get({
     'open-in-tab': false,
     'capture-media': false,
-    'screenshot-plugin': true,
+    'screenshot-plugin': isFF ? false : true,
     'cast-plugin': false,
-    'boost-plugin': true,
+    'boost-plugin': isFF ? false : true,
     'loop-plugin': true,
     'shuffle-plugin': true,
     'stop-plugin': true,
@@ -358,10 +359,14 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
 chrome.contextMenus.onClicked.addListener(info => {
   if (info.menuItemId === 'capture-media') {
     if (info.checked) {
-      chrome.permissions.request({
+      const opts = {
         permissions: ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'],
         origins: ['*://*/*']
-      }).catch(() => false).then(granted => {
+      };
+      if (isFF) {
+        opts.permissions = ['activeTab'];
+      }
+      chrome.permissions.request(opts).catch(() => false).then(granted => {
         chrome.storage.local.set({
           'capture-media': granted
         });
