@@ -1,0 +1,6 @@
+.vjs-hls-quality-selector .vjs-icon-placeholder::before {
+  content: '';
+  background: url('quality.svg') center center no-repeat;
+  background-size: 50%;
+  cursor: pointer;
+}

@@ -202,7 +202,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     title: 'Play with Media Player',
     id: 'play-link',
     contexts: ['link'],
-    targetUrlPatterns: FORMATS.map(a => '*://*/*.' + a),
+    targetUrlPatterns: FORMATS.map(a => ['*://*/*.' + a, '*://*/*.' + a + '*']).flat(),
     documentUrlPatterns: ['*://*/*']
   });
   chrome.contextMenus.create({
@@ -254,7 +254,8 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     'stop-plugin': true,
     'permission-plugin': true,
     'wave-plugin': true,
-    'pip-plugin': true
+    'pip-plugin': true,
+    'hls-quality-plugin': true
   }, prefs => {
     chrome.contextMenus.create({
       id: 'open-in-tab',
@@ -342,6 +343,14 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
       contexts: ['action'],
       type: 'checkbox',
       checked: prefs['pip-plugin'],
+      parentId: 'plugins'
+    });
+    chrome.contextMenus.create({
+      id: 'hls-quality-plugin',
+      title: 'HLS Quality Selector Plugin',
+      contexts: ['action'],
+      type: 'checkbox',
+      checked: prefs['hls-quality-plugin'],
       parentId: 'plugins'
     });
   });

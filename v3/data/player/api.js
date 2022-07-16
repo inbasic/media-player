@@ -74,7 +74,8 @@ chrome.storage.local.get({
   'stop-plugin': true,
   'wave-plugin': true,
   'permission-plugin': true,
-  'pip-plugin': true
+  'pip-plugin': true,
+  'hls-quality-plugin': true
 }, prefs => {
   if (prefs['cast-plugin']) {
     api.player.castButtonPlugin();
@@ -106,6 +107,10 @@ chrome.storage.local.get({
   }
   if (prefs['pip-plugin'] === false) {
     api.player.controlBar.pictureInPictureToggle.dispose();
+  }
+  if (prefs['hls-quality-plugin']) {
+    api.player.qualityLevels();
+    api.player.hlsQualitySelectorPlugin();
   }
 });
 
@@ -220,8 +225,6 @@ api.remote = urls => chrome.runtime.sendMessage({
   urls.push(...r);
   urls = urls.filter((s, i, l) => s && l.indexOf(s) === i);
 
-  console.log(urls);
-
   document.title = 'Please wait...';
   const playlist = urls.map(src => {
     if (/google\.[^./]+\/url?/.test(src)) {
@@ -232,10 +235,12 @@ api.remote = urls => chrome.runtime.sendMessage({
     }
     return src;
   }).map(src => {
+    const name = src.split('/').pop().slice(0, 100);
     return {
+      name,
       sources: [{
         src,
-        name: src.split('/').pop()
+        name
       }]
     };
   });
