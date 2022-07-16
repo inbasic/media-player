@@ -67,7 +67,7 @@ api.player = videojs('video-player', {
 // async plugins
 chrome.storage.local.get({
   'screenshot-plugin': true,
-  'cast-plugin': true,
+  'cast-plugin': false,
   'boost-plugin': true,
   'loop-plugin': true,
   'shuffle-plugin': true,
@@ -220,6 +220,8 @@ api.remote = urls => chrome.runtime.sendMessage({
   urls.push(...r);
   urls = urls.filter((s, i, l) => s && l.indexOf(s) === i);
 
+  console.log(urls);
+
   document.title = 'Please wait...';
   const playlist = urls.map(src => {
     if (/google\.[^./]+\/url?/.test(src)) {
@@ -258,7 +260,9 @@ api.remote = urls => chrome.runtime.sendMessage({
 api.remote.prompt = () => {
   const links = prompt('Comma-separated list of network URLs');
   if (links) {
-    api.remote(links.split(/\s*,\s*/));
+    // 'https://assets7.ign.com/master/videos/zencoder/2019/06/11/,640/d3e7aa2687f580e185c47f9288ccd139-347000,853/d3e7aa2687f580e185c47f9288ccd139-724000,960/d3e7aa2687f580e185c47f9288ccd139-1129000,1280/d3e7aa2687f580e185c47f9288ccd139-1910000,1920/d3e7aa2687f580e185c47f9288ccd139-3906000,-1560300082/master.m3u8, https://www.w3schools.com/html/mov_bbb.mp4'
+    const sp = links.split(/\s*,(?=\s*http)/).map(a => a.trim()).filter(a => a);
+    api.remote(sp);
   }
 };
 // api.toast

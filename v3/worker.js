@@ -247,7 +247,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     'open-in-tab': false,
     'capture-media': false,
     'screenshot-plugin': true,
-    'cast-plugin': true,
+    'cast-plugin': false,
     'boost-plugin': true,
     'loop-plugin': true,
     'shuffle-plugin': true,

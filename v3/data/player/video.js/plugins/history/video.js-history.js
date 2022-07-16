@@ -50,7 +50,7 @@
       player.on('ended', () => {
         const {name} = player.currentSource();
         if (name) {
-          cache[name] = 0;
+          delete cache[name];
           save();
         }
       });
