@@ -282,14 +282,16 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
       checked: prefs['screenshot-plugin'],
       parentId: 'plugins'
     });
-    chrome.contextMenus.create({
-      id: 'cast-plugin',
-      title: 'Cast Button Plugin',
-      contexts: ['action'],
-      type: 'checkbox',
-      checked: prefs['cast-plugin'],
-      parentId: 'plugins'
-    });
+    if (isFF !== true) {
+      chrome.contextMenus.create({
+        id: 'cast-plugin',
+        title: 'Cast Button Plugin',
+        contexts: ['action'],
+        type: 'checkbox',
+        checked: prefs['cast-plugin'],
+        parentId: 'plugins'
+      });
+    }
     chrome.contextMenus.create({
       id: 'boost-plugin',
       title: 'Boost Button Plugin',
