@@ -102,9 +102,10 @@ chrome.storage.local.get({
   }
   if (prefs['wave-plugin']) {
     api.player.waveSurferPlugin({
-      waveColor: 'rgba(115,133,159,.75)',
-      progressColor: 'rgba(0, 0, 0, 0.5)',
-      height: 300
+      waveColor: 'rgba(115, 133, 159, 0.5)',
+      progressColor: 'rgba(115, 133, 159, 1)',
+      height: 100,
+      width: 2
     });
   }
   if (prefs['pip-plugin'] === false) {

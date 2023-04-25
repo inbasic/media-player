@@ -45,7 +45,8 @@
               container: div,
               waveColor: options.waveColor,
               progressColor: options.progressColor,
-              height: options.height
+              height: options.height,
+              barWidth: options.width,
             });
             wavesurfer.on('ready', () => {
               wavesurfer.seekTo(player.currentTime() / player.duration());

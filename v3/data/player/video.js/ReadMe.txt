@@ -1,2 +1,2 @@
 video.js
-  https://github.com/videojs/video.js/releases/download/v7.19.2/video-js-7.19.2.zip
+  https://github.com/videojs/video.js/releases/download/v8.3.0/video-js-8.3.0.zip
