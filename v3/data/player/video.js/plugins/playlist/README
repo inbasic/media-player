@@ -1,6 +1,1 @@
-Official website:
-https://github.com/videojs/videojs-playlist
-There is no compiled package. Recommending using:
-
 https://cdn.jsdelivr.net/npm/videojs-playlist@4.3.1/dist/videojs-playlist.js
-MD5 (videojs-playlist.js) = 0ce12b432b74451679f1f0f05bee40f3

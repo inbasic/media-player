@@ -1,6 +1,2 @@
-Official website:
-https://github.com/videojs/videojs-playlist-ui
-There is no compiled package. Recommending using:
-
-https://cdn.jsdelivr.net/npm/videojs-playlist-ui@4.0.1/dist/videojs-playlist-ui.js
-https://cdn.jsdelivr.net/npm/videojs-playlist-ui@4.0.1/dist/videojs-playlist-ui.vertical.css
+https://cdn.jsdelivr.net/npm/videojs-playlist-ui@3.8.0/dist/videojs-playlist-ui.vertical.css
+https://cdn.jsdelivr.net/npm/videojs-playlist-ui@3.8.0/dist/videojs-playlist-ui.js

@@ -21,7 +21,7 @@ const api = {
       backward: (localStorage.getItem('seek.backward') || '10, 30').split(/\s*,\s*/).map(Number)
     },
     inactivityTimeout: 4,
-    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2').split(/\s*,\s*/).map(Number),
+    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 2').split(/\s*,\s*/).map(Number),
     delay: Number(localStorage.getItem('delay') || '1') // seconds
   }
 };
@@ -102,10 +102,9 @@ chrome.storage.local.get({
   }
   if (prefs['wave-plugin']) {
     api.player.waveSurferPlugin({
-      waveColor: 'rgba(115, 133, 159, 0.5)',
-      progressColor: 'rgba(115, 133, 159, 1)',
-      height: 100,
-      width: 2
+      waveColor: 'rgba(115,133,159,.75)',
+      progressColor: 'rgba(0, 0, 0, 0.5)',
+      height: 300
     });
   }
   if (prefs['pip-plugin'] === false) {

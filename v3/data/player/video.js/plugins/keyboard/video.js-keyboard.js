@@ -51,6 +51,12 @@
             }
           }
           break;
+        case 'KeyA':
+        case 'KeyQ':
+          api.player.controlBar.playbackRateMenuButton.el().dispatchEvent(new MouseEvent('click', {
+            shiftKey: code === 'KeyA'
+          }));
+          break;
         case 'KeyB':
           try {
             player.toggleBoost();
