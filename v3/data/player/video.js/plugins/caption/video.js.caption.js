@@ -121,8 +121,8 @@
           return;
         }
         // Subclass the component (see 'extend' doc for more info)
-        const CC = videojs.extend(Button, {
-          handleClick: function() {
+        class CC extends Button {
+          handleClick() {
             const index = player.playlist.currentItem();
             const input = document.createElement('input');
             input.type = 'file';
@@ -135,11 +135,15 @@
               }
             };
             input.click();
-          },
-          buildCSSClass: function() {
+          }
+          buildCSSClass() {
             return 'vjs-subs-caps-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
           }
-        });
+          controlText(str, e) {
+            e.title = str || 'Add Subtitle';
+          }
+        }
+
         // Register the new component
         Button.registerComponent('ccButton', CC);
         button = player.controlBar.ccButton = player.controlBar.addChild('ccButton');

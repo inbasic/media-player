@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.4.3",
+  "version": "0.4.4",
   "name": "MediaPlayer - Video and Audio Player",
   "description": "__MSG_description__",
   "default_locale": "en",
@@ -43,5 +43,5 @@
       "description": "Toggle Play/Pause"
     }
   },
-  "homepage_url": "https://add0n.com/the-media-player.html"
+  "homepage_url": "https://webextension.org/listing/the-media-player.html"
 }

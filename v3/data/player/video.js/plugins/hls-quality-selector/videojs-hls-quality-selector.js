@@ -35,16 +35,21 @@
       }
     }
     add(value, selected = false) {
-      const player = this.player();
-      const label = value.height ? (value.height + 'p') : 'NA';
+      if (value.height) {
+        const player = this.player();
+        const label = value.height ? (value.height + 'p') : 'NA';
 
-      const item = new QualityMenuItem(player, {
-        label,
-        value,
-        selectable: true,
-        selected
-      });
-      this.menu.addChild(item);
+        const item = new QualityMenuItem(player, {
+          label,
+          value,
+          selectable: true,
+          selected
+        });
+        this.menu.addChild(item);
+      }
+      else {
+        console.warn('Quality Dropped', value);
+      }
     }
     quality(v, change = false) {
       for (const item of this.menu.children()) {
@@ -76,6 +81,7 @@
           if (qualityLevels.length) {
             for (let i = 0; i < qualityLevels.length; i++) {
               const qualityLevel = qualityLevels[i];
+
               qualityButton.add(qualityLevel, qualityLevels.selectedIndex === i);
             }
             qualityButton.show();

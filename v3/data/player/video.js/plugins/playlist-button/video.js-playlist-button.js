@@ -14,16 +14,22 @@
           return;
         }
 
-        // Subclass the component (see 'extend' doc for more info)
-        const PlaylistButton = videojs.extend(Button, {
-          handleClick: () => player.playlistMenu.toggleClass('vjs-hidden'),
-          buildCSSClass: () => 'vjs-control vjs-button vjs-playlist-button vjs-hidden'
-        });
+        class PlaylistButton extends Button {
+          handleClick() {
+            player.playlistMenu.toggleClass('vjs-hidden');
+          }
+          buildCSSClass() {
+            return 'vjs-control vjs-button vjs-playlist-button vjs-hidden';
+          }
+          controlText(str, e) {
+            e.title = str || 'Playlist (P: Previous Track; N: Next Track)';
+          }
+        }
+
         // Register the new component
         Button.registerComponent('playlistButton', PlaylistButton);
         // playlist
         const playlist = player.controlBar.playlistButton = player.controlBar.addChild('playlistButton');
-        playlist.el().title = 'Playlist';
         player.controlBar.el().insertBefore(
           playlist.el(),
           player.controlBar.el().lastChild.previousSibling

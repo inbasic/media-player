@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /*! @name videojs-contrib-quality-levels @version 2.1.0 @license Apache-2.0 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('video.js'), require('global/document')) :
@@ -118,7 +120,8 @@
     function QualityLevelList() {
       var _this;
 
-      _this = _videojs$EventTarget.call(this) || this;
+      // _this = _videojs$EventTarget.call(this) || this;
+      _this = new _videojs$EventTarget();
 
       var list = _assertThisInitialized(_assertThisInitialized(_this)); // eslint-disable-line
 
@@ -319,28 +322,7 @@
     player.qualityLevels.VERSION = version;
     return qualityLevelList;
   };
-  /**
-   * A video.js plugin.
-   *
-   * In the plugin function, the value of `this` is a video.js `Player`
-   * instance. You cannot rely on the player being in a "ready" state here,
-   * depending on how the plugin is invoked. This may or may not be important
-   * to you; if not, remove the wait for "ready"!
-   *
-   * @param {Object} options Plugin options object
-   * @function qualityLevels
-   */
 
-
-  var qualityLevels = function qualityLevels(options) {
-    return initPlugin(this, videojs.mergeOptions({}, options));
-  }; // Register the plugin with video.js.
-
-
-  registerPlugin('qualityLevels', qualityLevels); // Include the version number.
-
-  qualityLevels.VERSION = version;
-
-  return qualityLevels;
+  return player.qualityLevels;
 
 })));

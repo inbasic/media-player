@@ -18,7 +18,7 @@
             name = item.sources[0].name;
           }
           const stat = (index + 1) + '/' + playlist.length;
-          document.title = `[${stat}] ${name} - ${api.config.name}`;
+          document.title = `[${stat}] ${name} - ${api.config.name.split('(')[0]}`;
           document.body.dataset.type = item.type;
           // toast
           api.toast(name);

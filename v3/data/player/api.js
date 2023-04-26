@@ -15,7 +15,7 @@ const api = {
   },
   arguments: {},
   config: {
-    name: 'Media Player',
+    name: 'Media Player (videojs v' + videojs.VERSION + ')',
     seek: {
       forward: (localStorage.getItem('seek.forward') || '10, 30').split(/\s*,\s*/).map(Number),
       backward: (localStorage.getItem('seek.backward') || '10, 30').split(/\s*,\s*/).map(Number)
@@ -111,7 +111,7 @@ chrome.storage.local.get({
     api.player.controlBar.pictureInPictureToggle.dispose();
   }
   if (prefs['hls-quality-plugin']) {
-    api.player.qualityLevels();
+    // api.player.qualityLevels();
     api.player.hlsQualitySelectorPlugin();
   }
 });
@@ -289,3 +289,4 @@ api.remote.prompt = () => {
     video.insertAdjacentElement('afterEnd', elem);
   });
 }
+

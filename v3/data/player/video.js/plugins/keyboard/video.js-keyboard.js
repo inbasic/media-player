@@ -1,4 +1,4 @@
-/* globals videojs, api, MediaMetadata */
+/* globals videojs, api */
 'use strict';
 
 {
@@ -36,7 +36,6 @@
 
       player.on('ready', () => {
         update(player.controlBar.playbackRateMenuButton, 'Q: Increase; Click: Increase; A: Decrease; Shift + Click: Decrease');
-        update(player.controlBar.playlistButton, 'P: Previous Track; N: Next Track');
         update(player.controlBar.fullscreenToggle, 'F');
       });
 
@@ -115,11 +114,6 @@
 
 Space: Toggle play/pause
 O Key: Open a network URL
-F Key: Toggle fullscreen
-N Key: Next track
-P Key: Previous track
-← Key: Seek -10 seconds
-→ Key: Seek +10 seconds
 ↑ Key: Volume up
 ↓ Key: Volume down`, {
             timeout: 1200,

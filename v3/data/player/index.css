@@ -62,6 +62,9 @@ button {
 .video-js .vjs-big-play-button {
   width: 6em !important;
   height: 2em !important;
+  top: 1ch !important;
+  left: 1ch !important;
+  margin: auto !important;
 }
 .video-js .vjs-big-play-button .vjs-icon-placeholder::before {
   content: 'Drag Media or Click to Start' !important;
@@ -86,6 +89,7 @@ button {
     display: none !important;
   }
 }
+
 @media screen and (max-width: 500px) {
   .vjs-seek-button {
     display: none !important;
