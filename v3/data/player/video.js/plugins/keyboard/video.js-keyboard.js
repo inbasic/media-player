@@ -29,6 +29,16 @@
           player.seekProgress('forward', 0);
         });
       });
+      // update descriptions
+      const update = (e, shortcut) => {
+        e.controlText(e.controlText() + ' (' + shortcut + ')');
+      };
+
+      player.on('ready', () => {
+        update(player.controlBar.playbackRateMenuButton, 'Q: Increase; Click: Increase; A: Decrease; Shift + Click: Decrease');
+        update(player.controlBar.playlistButton, 'P: Previous Track; N: Next Track');
+        update(player.controlBar.fullscreenToggle, 'F');
+      });
 
       document.body.addEventListener('keydown', ({code, shiftKey, ctrlKey, metaKey}) => {
         switch (code) {
