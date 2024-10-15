@@ -1,11 +1,13 @@
-/*! @name videojs-playlist @version 4.3.1 @license Apache-2.0 */
+/*! @name videojs-playlist @version 5.2.0 @license Apache-2.0 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('video.js')) :
   typeof define === 'function' && define.amd ? define(['video.js'], factory) :
-  (global = global || self, global.videojsPlaylist = factory(global.videojs));
-}(this, function (videojs) { 'use strict';
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.videojsPlaylist = factory(global.videojs));
+})(this, (function (videojs) { 'use strict';
 
-  videojs = videojs && videojs.hasOwnProperty('default') ? videojs['default'] : videojs;
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+  var videojs__default = /*#__PURE__*/_interopDefaultLegacy(videojs);
 
   /**
    * Validates a number of seconds to use as the auto-advance delay.
@@ -17,9 +19,7 @@
    * @return  {boolean}
    *          Whether this is a valid second or not
    */
-  var validSeconds = function validSeconds(s) {
-    return typeof s === 'number' && !isNaN(s) && s >= 0 && s < Infinity;
-  };
+  const validSeconds = s => typeof s === 'number' && !isNaN(s) && s >= 0 && s < Infinity;
   /**
    * Resets the auto-advance behavior of a player.
    *
@@ -28,8 +28,8 @@
    */
 
 
-  var reset = function reset(player) {
-    var aa = player.playlist.autoadvance_;
+  let reset = player => {
+    const aa = player.playlist.autoadvance_;
 
     if (aa.timeout) {
       player.clearTimeout(aa.timeout);
@@ -39,8 +39,13 @@
       player.off('ended', aa.trigger);
     }
 
+    if (aa.abortOrErrorHandler) {
+      player.off(['abort', 'error'], aa.abortOrErrorHandler);
+    }
+
     aa.timeout = null;
     aa.trigger = null;
+    aa.abortOrErrorHandler = null;
   };
   /**
    * Sets up auto-advance behavior on a player.
@@ -56,7 +61,7 @@
    */
 
 
-  var setup = function setup(player, delay) {
+  const setup = (player, delay) => {
     reset(player); // Before queuing up new auto-advance behavior, check if `seconds` was
     // called with a valid value.
 
@@ -70,23 +75,30 @@
     player.playlist.autoadvance_.trigger = function () {
       // This calls setup again, which will reset the existing auto-advance and
       // set up another auto-advance for the next "ended" event.
-      var cancelOnPlay = function cancelOnPlay() {
-        return setup(player, delay);
-      }; // If there is a "play" event while we're waiting for an auto-advance,
+      const cancelOnPlay = () => setup(player, delay); // If there is a "play" event while we're waiting for an auto-advance,
       // we need to cancel the auto-advance. This could mean the user seeked
       // back into the content or restarted the content. This is reproducible
       // with an auto-advance > 0.
 
 
       player.one('play', cancelOnPlay);
-      player.playlist.autoadvance_.timeout = player.setTimeout(function () {
+      player.playlist.autoadvance_.timeout = player.setTimeout(() => {
         reset(player);
         player.off('play', cancelOnPlay);
-        player.playlist.next();
+        player.one('loadstart', function () {
+          player.playlist.isAutoadvancing = true;
+        }); // Poster should be suppressed when auto-advancing
+
+        player.playlist.next(true);
       }, delay * 1000);
     };
 
+    player.playlist.autoadvance_.abortOrErrorHandler = function () {
+      player.playlist.isAutoadvancing = false;
+    };
+
     player.one('ended', player.playlist.autoadvance_.trigger);
+    player.one(['abort', 'error'], player.playlist.autoadvance_.abortOrErrorHandler);
   };
 
   /**
@@ -96,9 +108,9 @@
    *         The player to clear tracks on
    */
 
-  var clearTracks = function clearTracks(player) {
-    var tracks = player.remoteTextTracks();
-    var i = tracks && tracks.length || 0; // This uses a `while` loop rather than `forEach` because the
+  const clearTracks = player => {
+    const tracks = player.remoteTextTracks();
+    let i = tracks && tracks.length || 0; // This uses a `while` loop rather than `forEach` because the
     // `TextTrackList` object is a live DOM list (not an array).
 
     while (i--) {
@@ -113,33 +125,44 @@
    *
    * @param  {Object} item
    *         A source from the playlist.
+   * @param {boolean} [suppressPoster]
+   *         Should the native poster be suppressed? Defaults to false.
    *
    * @return {Player}
    *         The player that is now playing the item
    */
 
 
-  var playItem = function playItem(player, item) {
-    var replay = !player.paused() || player.ended();
+  const playItem = (player, item, suppressPoster = false) => {
+    const replay = !player.paused() || player.ended();
+
+    const displayPoster = () => {
+      if (player.audioPosterMode()) {
+        player.poster(item.poster || '');
+      }
+    };
+
     player.trigger('beforeplaylistitem', item.originalValue || item);
 
     if (item.playlistItemId_) {
       player.playlist.currentPlaylistItemId_ = item.playlistItemId_;
     }
 
-    player.poster(item.poster || '');
+    player.poster(suppressPoster ? '' : item.poster || '');
+    player.off('audiopostermodechange', displayPoster);
+    player.one('audiopostermodechange', displayPoster);
     player.src(item.sources);
     clearTracks(player);
-    player.ready(function () {
+    player.ready(() => {
       (item.textTracks || []).forEach(player.addRemoteTextTrack.bind(player));
       player.trigger('playlistitem', item.originalValue || item);
 
       if (replay) {
-        var playPromise = player.play(); // silence error when a pause interrupts a play request
+        const playPromise = player.play(); // silence error when a pause interrupts a play request
         // on browsers which return a promise
 
         if (typeof playPromise !== 'undefined' && typeof playPromise.then === 'function') {
-          playPromise.then(null, function (e) {});
+          playPromise.then(null, e => {});
         }
       }
 
@@ -148,25 +171,39 @@
     return player;
   };
 
+  let guid = 1;
   /**
-   * Returns whether a playlist item is an object of any kind, excluding null.
+   * Transform any primitive playlist item value into an object.
    *
-   * @private
+   * For non-object values, adds a property to the transformed item containing
+   * original value passed.
    *
-   * @param {Object}
-   *         value to be checked
+   * For all items, add a unique ID to each playlist item object. This id is
+   * used to determine the index of an item in the playlist array in cases where
+   * there are multiple otherwise identical items.
    *
-   * @return {boolean}
-   *          The result
+   * @param  {Object} newItem
+   *         An playlist item object, but accepts any value.
+   *
+   * @return {Object}
    */
 
-  var isItemObject = function isItemObject(value) {
-    return !!value && typeof value === 'object';
+  const preparePlaylistItem = newItem => {
+    let item = newItem;
+
+    if (!newItem || typeof newItem !== 'object') {
+      // Casting to an Object in this way allows primitives to retain their
+      // primitiveness (i.e. they will be cast back to primitives as needed).
+      item = Object(newItem);
+      item.originalValue = newItem;
+    }
+
+    item.playlistItemId_ = guid++;
+    return item;
   };
   /**
-   * Look through an array of playlist items and transform any primitive
-   * as well as null values to objects. This method also adds a property
-   * to the transformed item containing original value passed in an input list.
+   * Look through an array of playlist items and passes them to
+   * preparePlaylistItem.
    *
    * @private
    *
@@ -178,39 +215,7 @@
    */
 
 
-  var transformPrimitiveItems = function transformPrimitiveItems(arr) {
-    var list = [];
-    var tempItem;
-    arr.forEach(function (item) {
-      if (!isItemObject(item)) {
-        tempItem = Object(item);
-        tempItem.originalValue = item;
-      } else {
-        tempItem = item;
-      }
-
-      list.push(tempItem);
-    });
-    return list;
-  };
-  /**
-   * Generate a unique id for each playlist item object. This id will be used to determine
-   * index of an item in the playlist array for cases where there are multiple items with
-   * the same source set.
-   *
-   * @private
-   *
-   * @param  {Array} arr
-   *         An array of playlist items
-   */
-
-
-  var generatePlaylistItemId = function generatePlaylistItemId(arr) {
-    var guid = 1;
-    arr.forEach(function (item) {
-      item.playlistItemId_ = guid++;
-    });
-  };
+  const preparePlaylistItems = arr => arr.map(preparePlaylistItem);
   /**
    * Look through an array of playlist items for a specific playlist item id.
    *
@@ -226,8 +231,8 @@
    */
 
 
-  var indexInPlaylistItemIds = function indexInPlaylistItemIds(list, currentItemId) {
-    for (var i = 0; i < list.length; i++) {
+  const indexInPlaylistItemIds = (list, currentItemId) => {
+    for (let i = 0; i < list.length; i++) {
       if (list[i].playlistItemId_ === currentItemId) {
         return i;
       }
@@ -252,9 +257,9 @@
    */
 
 
-  var sourceEquals = function sourceEquals(source1, source2) {
-    var src1 = source1;
-    var src2 = source2;
+  const sourceEquals = (source1, source2) => {
+    let src1 = source1;
+    let src2 = source2;
 
     if (typeof source1 === 'object') {
       src1 = source1.src;
@@ -291,13 +296,13 @@
    */
 
 
-  var indexInSources = function indexInSources(arr, src) {
-    for (var i = 0; i < arr.length; i++) {
-      var sources = arr[i].sources;
+  const indexInSources = (arr, src) => {
+    for (let i = 0; i < arr.length; i++) {
+      const sources = arr[i].sources;
 
       if (Array.isArray(sources)) {
-        for (var j = 0; j < sources.length; j++) {
-          var source = sources[j];
+        for (let j = 0; j < sources.length; j++) {
+          const source = sources[j];
 
           if (source && sourceEquals(source, src)) {
             return i;
@@ -320,13 +325,13 @@
    */
 
 
-  var randomize = function randomize(arr) {
-    var index = -1;
-    var lastIndex = arr.length - 1;
+  const randomize = arr => {
+    let index = -1;
+    const lastIndex = arr.length - 1;
 
     while (++index < arr.length) {
-      var rand = index + Math.floor(Math.random() * (lastIndex - index + 1));
-      var value = arr[rand];
+      const rand = index + Math.floor(Math.random() * (lastIndex - index + 1));
+      const value = arr[rand];
       arr[rand] = arr[index];
       arr[index] = value;
     }
@@ -366,13 +371,9 @@
    */
 
 
-  function factory(player, initialList, initialIndex) {
-    if (initialIndex === void 0) {
-      initialIndex = 0;
-    }
-
-    var list = null;
-    var changing = false;
+  function factory(player, initialList, initialIndex = 0) {
+    let list = null;
+    let changing = false;
     /**
      * Get/set the playlist for a player.
      *
@@ -392,37 +393,21 @@
      *         The playlist
      */
 
-    var playlist = player.playlist = function (newList, newIndex) {
-      if (newIndex === void 0) {
-        newIndex = 0;
-      }
-
+    const playlist = player.playlist = (nextPlaylist, newIndex = 0) => {
       if (changing) {
         throw new Error('do not call playlist() during a playlist change');
       }
 
-      if (Array.isArray(newList)) {
+      if (Array.isArray(nextPlaylist)) {
         // @todo - Simplify this to `list.slice()` for v5.
-        var previousPlaylist = Array.isArray(list) ? list.slice() : null;
-        var nextPlaylist = newList.slice();
-        list = nextPlaylist.slice(); // Transform any primitive and null values in an input list to objects
-
-        if (list.filter(function (item) {
-          return isItemObject(item);
-        }).length !== list.length) {
-          list = transformPrimitiveItems(list);
-        } // Add unique id to each playlist item. This id will be used
-        // to determine index in cases where there are more than one
-        // identical sources in the playlist.
-
-
-        generatePlaylistItemId(list); // Mark the playlist as changing during the duringplaylistchange lifecycle.
+        const previousPlaylist = Array.isArray(list) ? list.slice() : null;
+        list = preparePlaylistItems(nextPlaylist); // Mark the playlist as changing during the duringplaylistchange lifecycle.
 
         changing = true;
         player.trigger({
           type: 'duringplaylistchange',
           nextIndex: newIndex,
-          nextPlaylist: nextPlaylist,
+          nextPlaylist,
           previousIndex: playlist.currentIndex_,
           // @todo - Simplify this to simply pass along `previousPlaylist` for v5.
           previousPlaylist: previousPlaylist || []
@@ -441,21 +426,22 @@
 
 
         if (previousPlaylist) {
-          player.setTimeout(function () {
-            player.trigger('playlistchange');
+          player.setTimeout(() => {
+            player.trigger({
+              type: 'playlistchange',
+              action: 'change'
+            });
           }, 0);
         }
       } // Always return a shallow clone of the playlist list.
-      //  We also want to return originalValue if any item in the list has it.
+      // We also want to return originalValue if any item in the list has it.
 
 
-      return list.map(function (item) {
-        return item.originalValue || item;
-      }).slice();
+      return list.map(item => item.originalValue || item);
     }; // On a new source, if there is no current item, disable auto-advance.
 
 
-    player.on('loadstart', function () {
+    player.on('loadstart', () => {
       if (playlist.currentItem() === -1) {
         reset(player);
       }
@@ -472,12 +458,14 @@
      *
      * @param  {number} [index]
      *         If given as a valid value, plays the playlist item at that index.
+     * @param {boolean} [suppressPoster]
+     *         Should the native poster be suppressed? Defaults to false.
      *
      * @return {number}
      *         The current item index.
      */
 
-    playlist.currentItem = function (index) {
+    playlist.currentItem = (index, suppressPoster) => {
       // If the playlist is changing, only act as a getter.
       if (changing) {
         return playlist.currentIndex_;
@@ -486,19 +474,19 @@
 
       if (typeof index === 'number' && playlist.currentIndex_ !== index && index >= 0 && index < list.length) {
         playlist.currentIndex_ = index;
-        playItem(playlist.player_, list[playlist.currentIndex_]);
+        playItem(playlist.player_, list[playlist.currentIndex_], suppressPoster);
         return playlist.currentIndex_;
       }
 
-      var src = playlist.player_.currentSrc() || ''; // If there is a currentPlaylistItemId_, validate that it matches the
+      const src = playlist.player_.currentSrc() || ''; // If there is a currentPlaylistItemId_, validate that it matches the
       // current source URL returned by the player. This is sufficient evidence
       // to suggest that the source was set by the playlist plugin. This code
       // exists primarily to deal with playlists where multiple items have the
       // same source.
 
       if (playlist.currentPlaylistItemId_) {
-        var indexInItemIds = indexInPlaylistItemIds(list, playlist.currentPlaylistItemId_);
-        var item = list[indexInItemIds]; // Found a match, this is our current index!
+        const indexInItemIds = indexInPlaylistItemIds(list, playlist.currentPlaylistItemId_);
+        const item = list[indexInItemIds]; // Found a match, this is our current index!
 
         if (item && Array.isArray(item.sources) && indexInSources([item], src) > -1) {
           playlist.currentIndex_ = indexInItemIds;
@@ -516,6 +504,125 @@
       return playlist.currentIndex_;
     };
     /**
+     * A custom DOM event that is fired when new item(s) are added to the current
+     * playlist (rather than replacing the entire playlist).
+     *
+     * Unlike playlistchange, this is fired synchronously as it does not
+     * affect playback.
+     *
+     * @typedef  {Object} PlaylistAddEvent
+     * @see      [CustomEvent Properties]{@link https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent}
+     * @property {string} type
+     *           Always "playlistadd"
+     *
+     * @property {number} count
+     *           The number of items that were added.
+     *
+     * @property {number} index
+     *           The starting index where item(s) were added.
+     */
+
+    /**
+     * A custom DOM event that is fired when new item(s) are removed from the
+     * current playlist (rather than replacing the entire playlist).
+     *
+     * This is fired synchronously as it does not affect playback.
+     *
+     * @typedef  {Object} PlaylistRemoveEvent
+     * @see      [CustomEvent Properties]{@link https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent}
+     * @property {string} type
+     *           Always "playlistremove"
+     *
+     * @property {number} count
+     *           The number of items that were removed.
+     *
+     * @property {number} index
+     *           The starting index where item(s) were removed.
+     */
+
+    /**
+     * Add one or more items to the playlist.
+     *
+     * @fires  {PlaylistAddEvent}
+     * @throws {Error}
+     *         If called during the duringplaylistchange event, throws an error.
+     *
+     * @param  {string|Object|Array}  item
+     *         An item - or array of items - to be added to the playlist.
+     *
+     * @param  {number} [index]
+     *         If given as a valid value, injects the new playlist item(s)
+     *         starting from that index. Otherwise, the item(s) are appended.
+     */
+
+
+    playlist.add = (items, index) => {
+      if (changing) {
+        throw new Error('cannot modify a playlist that is currently changing');
+      }
+
+      if (typeof index !== 'number' || index < 0 || index > list.length) {
+        index = list.length;
+      }
+
+      if (!Array.isArray(items)) {
+        items = [items];
+      }
+
+      list.splice(index, 0, ...preparePlaylistItems(items)); // playlistchange is triggered synchronously in this case because it does
+      // not change the current media source
+
+      player.trigger({
+        type: 'playlistchange',
+        action: 'add'
+      });
+      player.trigger({
+        type: 'playlistadd',
+        count: items.length,
+        index
+      });
+    };
+    /**
+     * Remove one or more items from the playlist.
+     *
+     * @fires  {PlaylistRemoveEvent}
+     * @throws {Error}
+     *         If called during the duringplaylistchange event, throws an error.
+     *
+     * @param  {number} index
+     *         If a valid index in the current playlist, removes the item at that
+     *         index from the playlist.
+     *
+     *         If no valid index is given, nothing is removed from the playlist.
+     *
+     * @param  {number} [count=1]
+     *         The number of items to remove from the playlist.
+     */
+
+
+    playlist.remove = (index, count = 1) => {
+      if (changing) {
+        throw new Error('cannot modify a playlist that is currently changing');
+      }
+
+      if (typeof index !== 'number' || index < 0 || index > list.length) {
+        return;
+      }
+
+      list.splice(index, count); // playlistchange is triggered synchronously in this case because it does
+      // not change the current media source
+
+      player.trigger({
+        type: 'playlistchange',
+        action: 'remove'
+      });
+      player.trigger({
+        type: 'playlistremove',
+        count,
+        index
+      });
+    };
+    /**
      * Checks if the playlist contains a value.
      *
      * @param  {string|Object|Array} value
@@ -526,7 +633,7 @@
      */
 
 
-    playlist.contains = function (value) {
+    playlist.contains = value => {
       return playlist.indexOf(value) !== -1;
     };
     /**
@@ -540,15 +647,15 @@
      */
 
 
-    playlist.indexOf = function (value) {
+    playlist.indexOf = value => {
       if (typeof value === 'string') {
         return indexInSources(list, value);
       }
 
-      var sources = Array.isArray(value) ? value : value.sources;
+      const sources = Array.isArray(value) ? value : value.sources;
 
-      for (var i = 0; i < sources.length; i++) {
-        var source = sources[i];
+      for (let i = 0; i < sources.length; i++) {
+        const source = sources[i];
 
         if (typeof source === 'string') {
           return indexInSources(list, source);
@@ -568,9 +675,7 @@
      */
 
 
-    playlist.currentIndex = function () {
-      return playlist.currentItem();
-    };
+    playlist.currentIndex = () => playlist.currentItem();
     /**
      * Get the index of the last item in the playlist.
      *
@@ -580,9 +685,7 @@
      */
 
 
-    playlist.lastIndex = function () {
-      return list.length - 1;
-    };
+    playlist.lastIndex = () => list.length - 1;
     /**
      * Get the index of the next item in the playlist.
      *
@@ -592,14 +695,14 @@
      */
 
 
-    playlist.nextIndex = function () {
-      var current = playlist.currentItem();
+    playlist.nextIndex = () => {
+      const current = playlist.currentItem();
 
       if (current === -1) {
         return -1;
       }
 
-      var lastIndex = playlist.lastIndex(); // When repeating, loop back to the beginning on the last item.
+      const lastIndex = playlist.lastIndex(); // When repeating, loop back to the beginning on the last item.
 
       if (playlist.repeat_ && current === lastIndex) {
         return 0;
@@ -617,8 +720,8 @@
      */
 
 
-    playlist.previousIndex = function () {
-      var current = playlist.currentItem();
+    playlist.previousIndex = () => {
+      const current = playlist.currentItem();
 
       if (current === -1) {
         return -1;
@@ -640,12 +743,12 @@
      */
 
 
-    playlist.first = function () {
+    playlist.first = () => {
       if (changing) {
         return;
       }
 
-      var newItem = playlist.currentItem(0);
+      const newItem = playlist.currentItem(0);
 
       if (list.length) {
         return list[newItem].originalValue || list[newItem];
@@ -661,12 +764,12 @@
      */
 
 
-    playlist.last = function () {
+    playlist.last = () => {
       if (changing) {
         return;
       }
 
-      var newItem = playlist.currentItem(playlist.lastIndex());
+      const newItem = playlist.currentItem(playlist.lastIndex());
 
       if (list.length) {
         return list[newItem].originalValue || list[newItem];
@@ -677,20 +780,22 @@
     /**
      * Plays the next item in the playlist.
      *
+     * @param {boolean} [suppressPoster]
+     *         Should the native poster be suppressed? Defaults to false.
      * @return {Object|undefined}
      *         Returns undefined and has no side effects if on last item.
      */
 
 
-    playlist.next = function () {
+    playlist.next = (suppressPoster = false) => {
       if (changing) {
         return;
       }
 
-      var index = playlist.nextIndex();
+      const index = playlist.nextIndex();
 
       if (index !== playlist.currentIndex_) {
-        var newItem = playlist.currentItem(index);
+        const newItem = playlist.currentItem(index, suppressPoster);
         return list[newItem].originalValue || list[newItem];
       }
     };
@@ -702,15 +807,15 @@
      */
 
 
-    playlist.previous = function () {
+    playlist.previous = () => {
       if (changing) {
         return;
       }
 
-      var index = playlist.previousIndex();
+      const index = playlist.previousIndex();
 
       if (index !== playlist.currentIndex_) {
-        var newItem = playlist.currentItem(index);
+        const newItem = playlist.currentItem(index);
         return list[newItem].originalValue || list[newItem];
       }
     };
@@ -722,7 +827,7 @@
      */
 
 
-    playlist.autoadvance = function (delay) {
+    playlist.autoadvance = delay => {
       setup(playlist.player_, delay);
     };
     /**
@@ -737,13 +842,13 @@
      */
 
 
-    playlist.repeat = function (val) {
+    playlist.repeat = val => {
       if (val === undefined) {
         return playlist.repeat_;
       }
 
       if (typeof val !== 'boolean') {
-        videojs.log.error('videojs-playlist: Invalid value for repeat', val);
+        videojs__default["default"].log.error('videojs-playlist: Invalid value for repeat', val);
         return;
       }
 
@@ -761,7 +866,7 @@
      */
 
 
-    playlist.sort = function (compare) {
+    playlist.sort = compare => {
       // Bail if the array is empty.
       if (!list.length) {
         return;
@@ -790,7 +895,7 @@
      */
 
 
-    playlist.reverse = function () {
+    playlist.reverse = () => {
       // Bail if the array is empty.
       if (!list.length) {
         return;
@@ -831,12 +936,11 @@
      */
 
 
-    playlist.shuffle = function (_temp) {
-      var _ref = _temp === void 0 ? {} : _temp,
-          rest = _ref.rest;
-
-      var index = 0;
-      var arr = list; // When options.rest is true, start randomization at the item after the
+    playlist.shuffle = ({
+      rest
+    } = {}) => {
+      let index = 0;
+      let arr = list; // When options.rest is true, start randomization at the item after the
       // current item.
 
       if (rest) {
@@ -853,9 +957,7 @@
       // the original array.
 
       if (rest) {
-        var _list;
-
-        (_list = list).splice.apply(_list, [index, arr.length].concat(arr));
+        list.splice(...[index, arr.length].concat(arr));
       } // If the playlist is changing, don't trigger events.
 
 
@@ -875,7 +977,7 @@
 
 
     if (Array.isArray(initialList)) {
-      playlist(initialList.slice(), initialIndex); // If there is no initial list given, silently set an empty array.
+      playlist(initialList, initialIndex); // If there is no initial list given, silently set an empty array.
     } else {
       list = [];
     }
@@ -883,9 +985,9 @@
     return playlist;
   }
 
-  var version = "4.3.1";
+  var version = "5.2.0";
 
-  var registerPlugin = videojs.registerPlugin || videojs.plugin;
+  const registerPlugin = videojs__default["default"].registerPlugin || videojs__default["default"].plugin;
   /**
    * The video.js playlist plugin. Invokes the playlist-maker to create a
    * playlist function on the specific player.
@@ -897,7 +999,7 @@
    *        The index to start at
    */
 
-  var plugin = function plugin(list, item) {
+  const plugin = function (list, item) {
     factory(this, list, item);
   };
 

@@ -16,6 +16,8 @@ window.addEventListener('beforeunload', () => chrome.runtime.sendMessage({
 // message passing
 if (chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener((request, sender, response) => {
+    console.log(request);
+
     if (request.method === 'open-src') {
       api.remote([request.src]);
       response(true);
@@ -37,6 +39,10 @@ if (chrome.runtime && chrome.runtime.onMessage) {
       chrome.runtime.sendMessage({
         method: 'bring-to-front'
       });
+    }
+    else if (request.method === 'worker-is-ready') {
+      navigator.serviceWorker.ready.then(() => response(true));
+      return true;
     }
   });
 }

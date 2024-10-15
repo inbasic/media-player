@@ -10,9 +10,12 @@
     constructor(player, options) {
       super(player, options);
 
-      player.on('beforeplaylistitem', () => {
+      this.#rate = player.playbackRate();
+
+      player.on('ratechange', () => {
         this.#rate = player.playbackRate();
       });
+
       player.on('playlistitem', () => {
         player.playbackRate(this.#rate);
       });
@@ -20,10 +23,12 @@
       player.on('ready', () => {
         // overwrite the default click handler over the rate button
         player.controlBar.playbackRateMenuButton.el().addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
+          if (e.target.type === 'button') {
+            e.preventDefault();
+            e.stopPropagation();
 
-          this.change(e.shiftKey ? 'backward' : 'forward');
+            this.change(e.shiftKey ? 'backward' : 'forward');
+          }
         }, true);
       });
     }

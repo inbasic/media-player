@@ -1,4 +1,4 @@
-/* globals videojs */
+/* global videojs */
 'use strict';
 
 {

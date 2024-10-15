@@ -21,7 +21,7 @@ const api = {
       backward: (localStorage.getItem('seek.backward') || '10, 30').split(/\s*,\s*/).map(Number)
     },
     inactivityTimeout: 4,
-    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.25, 1.5, 2').split(/\s*,\s*/).map(Number),
+    playbackRates: (localStorage.getItem('rates') || '0.25, 0.5, 0.75, 1, 1.5, 2').split(/\s*,\s*/).map(Number),
     delay: Number(localStorage.getItem('delay') || '1') // seconds
   }
 };
@@ -32,6 +32,14 @@ if (window.location.search) {
     api.arguments[tmp[0]] = decodeURIComponent(tmp[1]);
   });
 }
+
+const bc = new BroadcastChannel('player-view');
+bc.onmessage = e => {
+  if (e.data.files) {
+    api.local([...e.data.files]);
+  }
+};
+
 api.player = videojs('video-player', {
   'fluid': true,
   'playbackRates': api.config.playbackRates,
@@ -263,6 +271,15 @@ api.remote = urls => chrome.runtime.sendMessage({
   }));
   api.append(playlist);
 });
+// Get cross-page native files
+api.remote = new Proxy(api.remote, {
+  apply(target, self, args) {
+    if (args[0].includes('transfer-local-files')) {
+      return bc.postMessage('send-files');
+    }
+    return Reflect.apply(target, self, args);
+  }
+});
 
 api.remote.prompt = () => {
   const links = prompt('Comma-separated list of network URLs');
@@ -279,10 +296,10 @@ api.remote.prompt = () => {
   api.toast = (msg, options = {
     timeout: 2
   }) => {
-    window.clearTimeout(id);
+    clearTimeout(id);
     elem.setAttribute('style', options.style || '');
     elem.textContent = msg;
-    id = window.setTimeout(() => elem.textContent = '', options.timeout * 1000);
+    id = setTimeout(() => elem.textContent = '', options.timeout * 1000);
   };
   api.player.on('ready', () => {
     const video = api.player.el().querySelector('video');

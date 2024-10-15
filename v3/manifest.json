@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.4.4",
+  "version": "0.4.6",
   "name": "MediaPlayer - Video and Audio Player",
   "description": "__MSG_description__",
   "default_locale": "en",
@@ -23,13 +23,13 @@
   ],
   "action": {},
   "icons": {
-    "16": "data/icons/16.png",
-    "32": "data/icons/32.png",
-    "48": "data/icons/48.png",
-    "64": "data/icons/64.png",
-    "128": "data/icons/128.png",
-    "256": "data/icons/256.png",
-    "512": "data/icons/512.png"
+    "16": "/data/icons/16.png",
+    "32": "/data/icons/32.png",
+    "48": "/data/icons/48.png",
+    "64": "/data/icons/64.png",
+    "128": "/data/icons/128.png",
+    "256": "/data/icons/256.png",
+    "512": "/data/icons/512.png"
   },
   "commands": {
     "_execute_action": {},
@@ -43,5 +43,36 @@
       "description": "Toggle Play/Pause"
     }
   },
+  "file_handlers": [{
+    "action": "/file_handlers/index.html",
+    "name": "Open with MediaPlayer",
+    "accept": {
+      "video/avi": [".avi"],
+      "video/mp4": [".mp4"],
+      "video/webm": [".webm"],
+      "video/x-flv": [".flv"],
+      "video/quicktime": [".mov"],
+      "video/ogg": [".ogv"],
+      "video/3gpp": [".3gp"],
+      "video/mpeg": [".mpg"],
+      "video/x-ms-wmv": [".wmv"],
+      "application/x-shockwave-flash": [".swf"],
+      "video/x-matroska": [".mkv"],
+      "video/dvd": [".vob"],
+      "audio/pcm": [".pcm"],
+      "audio/wav": [".wav"],
+      "audio/aac": [".aac"],
+      "audio/ogg": [".ogg"],
+      "audio/x-ms-wma": [".wma"],
+      "audio/flac": [".flac"],
+      "audio/midi": [".mid"],
+      "audio/x-matroska": [".mka"],
+      "audio/mp4": [".m4a"],
+      "audio/voc": [".voc"],
+      "audio/mpeg": [".mp3"],
+      "application/vnd.apple.mpegurl": [".m3u8"]
+    },
+    "launch_type": "single-client"
+  }],
   "homepage_url": "https://webextension.org/listing/the-media-player.html"
 }
