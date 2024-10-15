@@ -13,7 +13,8 @@
           const item = player.playlist()[index];
           if (item.duration === '--') {
             item.duration = player.duration();
-            player.playlistMenu.items[index].el().querySelector('time').textContent = videojs.formatTime(item.duration);
+            player.playlistMenu.items[index].el().querySelector('time').textContent =
+              videojs.time.formatTime(item.duration);
           }
         }
       });
