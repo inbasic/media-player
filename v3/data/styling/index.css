@@ -1,0 +1,30 @@
+body {
+  font-size: 14px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+  background-color: #fff;
+  color: #4d5156;
+  width: min(100% - 2rem, 70rem);
+  margin-inline: auto;
+  display: grid;
+  grid-template-rows: 1fr min-content;
+  margin-block: 0;
+  height: 100vh;
+}
+body > div {
+  padding: 1ch 0;
+  text-align: end;
+}
+textarea {
+  margin-top: 1ch;
+  padding: 1ch;
+  outline: none;
+  border-radius: 0;
+}
+input[type="button"] {
+  height: 28px;
+  color: #444;
+  background-image: linear-gradient(rgb(237, 237, 237), rgb(237, 237, 237) 38%, rgb(222, 222, 222));
+  box-shadow: rgba(0, 0, 0, 0.08) 0 1px 0, rgba(255, 255, 255, 0.75) 0 1px 2px inset;
+  text-shadow: rgb(240, 240, 240) 0 1px 0;
+  border: solid 1px rgba(0, 0, 0, 0.25);
+}
