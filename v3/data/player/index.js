@@ -16,8 +16,6 @@ window.addEventListener('beforeunload', () => chrome.runtime.sendMessage({
 // message passing
 if (chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener((request, sender, response) => {
-    console.log(request);
-
     if (request.method === 'open-src') {
       api.remote([request.src]);
       response(true);

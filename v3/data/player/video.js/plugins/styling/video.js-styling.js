@@ -11,7 +11,6 @@
       // user styling
       {
         const css = localStorage.getItem('user-styling');
-        console.log(css);
         if (css) {
           const style = document.createElement('style');
           style.textContent = css;

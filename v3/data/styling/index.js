@@ -10,5 +10,11 @@ self.save.onclick = () => {
   }, 750);
 };
 
-
 self.editor.value = localStorage.getItem('user-styling') || '';
+
+self.addEventListener('keydown', e => {
+  if (e.code === 'KeyS' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    self.save.click();
+  }
+});

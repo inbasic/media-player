@@ -1,12 +1,15 @@
 .vjs-button.vjs-permission-button {
   cursor: pointer;
-  width: 16em;
+  width: 8em;
   font-size: 6px;
   white-space: nowrap;
 }
 .vjs-permission-button .vjs-icon-placeholder::before {
-  content: 'Capture Media';
+  content: 'Capture';
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.vjs-permission-button .vjs-control:focus {
+  text-shadow: none;
 }
