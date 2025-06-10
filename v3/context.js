@@ -72,7 +72,6 @@ const isFF = /Firefox/.test(navigator.userAgent);
       'open-in-tab': false,
       'capture-media': false,
       'screenshot-plugin': isFF ? false : true,
-      'cast-plugin': false,
       'boost-plugin': isFF ? false : true,
       'loop-plugin': true,
       'shuffle-plugin': true,
@@ -104,14 +103,6 @@ const isFF = /Firefox/.test(navigator.userAgent);
         contexts: ['action'],
         type: 'checkbox',
         checked: prefs['screenshot-plugin'],
-        parentId: 'plugins'
-      });
-      chrome.contextMenus.create({
-        id: 'cast-plugin',
-        title: 'Cast Button Plugin',
-        contexts: ['action'],
-        type: 'checkbox',
-        checked: prefs['cast-plugin'],
         parentId: 'plugins'
       });
       chrome.contextMenus.create({
@@ -192,7 +183,7 @@ chrome.contextMenus.onClicked.addListener(info => {
   }
   else if (info.menuItemId === 'capture-media') {
     if (info.checked) {
-      const permissions = ['activeTab', 'declarativeNetRequestWithHostAccess'];
+      const permissions = ['activeTab'];
       if (chrome.runtime.getManifest().manifest_version > 2) {
         permissions.push('scripting');
       }

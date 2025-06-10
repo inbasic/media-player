@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.4.7",
+  "version": "0.4.8",
   "name": "MediaPlayer - Video and Audio Player",
   "description": "__MSG_description__",
   "default_locale": "en",
@@ -16,12 +16,12 @@
   "permissions": [
     "storage",
     "contextMenus",
-    "notifications"
+    "notifications",
+    "declarativeNetRequestWithHostAccess"
   ],
   "optional_permissions": [
     "activeTab",
-    "scripting",
-    "declarativeNetRequestWithHostAccess"
+    "scripting"
   ],
   "optional_host_permissions": [
     "*://*/*"

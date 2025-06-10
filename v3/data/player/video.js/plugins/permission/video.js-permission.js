@@ -1,7 +1,7 @@
 /* global videojs, api */
 
 {
-  const permissions = /Firefox/.test(navigator.userAgent) ? ['activeTab'] : ['activeTab', 'scripting', 'declarativeNetRequestWithHostAccess'];
+  const permissions = /Firefox/.test(navigator.userAgent) ? ['activeTab'] : ['activeTab', 'scripting'];
   const Button = videojs.getComponent('Button');
   class PermissionButton extends Button {
     handleClick() {
@@ -12,6 +12,9 @@
         if (granted) {
           chrome.storage.local.set({
             'capture-media': true
+          });
+          chrome.contextMenus.update('capture-media', {
+            checked: true
           });
           this.player_.permissionButton.hide();
           api.toast('Please reopen to grab media from the current tab');
