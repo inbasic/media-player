@@ -197,7 +197,7 @@ const dtype = (type = '') => {
 api.local = files => {
   const playlist = files.filter(f => {
     if (f.type) {
-      return f.type.startsWith('video/') || f.type.startsWith('audio/');
+      return videojs.getTech('Html5').canPlayType(f.type);
     }
     else {
       return exts.some(e => f.name.toLowerCase().indexOf('.' + e) !== -1);

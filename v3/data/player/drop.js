@@ -1,4 +1,4 @@
-/* globals api */
+/* globals api, videojs */
 'use strict';
 
 const drop = async es => {
@@ -14,7 +14,7 @@ const drop = async es => {
     const file = await new Promise(resolve => entry.file(resolve));
 
     if (file.type) {
-      if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+      if (videojs.getTech('Html5').canPlayType(file.type)) {
         files.push(file);
       }
     }
