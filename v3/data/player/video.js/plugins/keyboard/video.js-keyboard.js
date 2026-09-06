@@ -108,12 +108,29 @@
         }
       });
 
+      document.addEventListener('paste', e => {
+        const target = e.target;
+        if (target.isContentEditable || /^(INPUT|TEXTAREA)$/.test(target.tagName)) {
+          return;
+        }
+        const text = (e.clipboardData?.getData('text/plain') || '').trim();
+        if (!text) {
+          return;
+        }
+        if (/^https?:\/\//im.test(text) === false) {
+          api.toast('No media link found in the clipboard');
+          return;
+        }
+        api.remote.fromText(text);
+      });
+
       player.on('ready', () => {
         if (!('src' in api.arguments)) {
           api.toast(`Drop a video file to start or click on the "Play button"
 
 Space: Toggle play/pause
 O Key: Open a network URL
+Ctrl + V: Paste a network URL
 ↑ Key: Volume up
 ↓ Key: Volume down`, {
             timeout: 1200,
