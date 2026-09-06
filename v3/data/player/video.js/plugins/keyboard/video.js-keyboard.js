@@ -114,14 +114,9 @@
           return;
         }
         const text = (e.clipboardData?.getData('text/plain') || '').trim();
-        if (!text) {
-          return;
-        }
-        if (/^https?:\/\//im.test(text) === false) {
+        if (text && api.remote.fromText(text).length === 0) {
           api.toast('No media link found in the clipboard');
-          return;
         }
-        api.remote.fromText(text);
       });
 
       player.on('ready', () => {

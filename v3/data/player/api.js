@@ -278,9 +278,12 @@ api.remote = new Proxy(api.remote, {
   }
 });
 
-api.remote.fromText = text => {
+api.remote.parse = text => {
   // 'https://assets7.ign.com/master/videos/zencoder/2019/06/11/,640/d3e7aa2687f580e185c47f9288ccd139-347000,853/d3e7aa2687f580e185c47f9288ccd139-724000,960/d3e7aa2687f580e185c47f9288ccd139-1129000,1280/d3e7aa2687f580e185c47f9288ccd139-1910000,1920/d3e7aa2687f580e185c47f9288ccd139-3906000,-1560300082/master.m3u8, https://www.w3schools.com/html/mov_bbb.mp4'
-  const links = text.split(/\s*,(?=\s*http)|[\r\n]+/).map(a => a.trim()).filter(a => a);
+  return (text || '').split(/\s*,(?=\s*http)|[\r\n]+/).map(a => a.trim()).filter(a => /^https?:\/\//i.test(a));
+};
+api.remote.fromText = text => {
+  const links = api.remote.parse(text);
   if (links.length) {
     api.remote(links);
   }
@@ -289,7 +292,7 @@ api.remote.fromText = text => {
 api.remote.prompt = async () => {
   const cl = (await navigator.clipboard.readText().catch(() => '')) || '';
 
-  const links = prompt('Comma-separated list of network URLs', cl);
+  const links = prompt('Comma-separated list of network URLs', api.remote.parse(cl).join(', '));
   if (links) {
     api.remote.fromText(links);
   }
